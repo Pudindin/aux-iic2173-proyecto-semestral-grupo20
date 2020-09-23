@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+
+  <title><%= room.name %></title>
+  <meta name="description" content="Chat room">
+  <meta name="author" content="Diego Vásquez">
+
+  <link rel="stylesheet" href="/css/styles.css">
+
+</head>
+
+<body>
+  <h1>Chat</h1>
+  <h3>Sala: <p id="room-name"><%= room.name %></p></h3>
+  <h3>Usuario: <p id="current-user"><%= user %></p></h3>
+  <div id="chat-sheet">
+    <% if (messagesListV2.length) { %>
+    <% messagesListV2.forEach((message) => { %>
+      <% if (message.user !== user) { %>
+        <div class="message">
+          <p class="meta"><%= message.user %> <span><%= message.date %></span></p>
+          <p class="text"><%= message.message %></p>
+        </div>
+      <% } else { %>
+        <div class="message-emit">
+          <p class="meta"><%= message.user %> <span><%= message.date %></span></p>
+          <p class="text"><%= message.message %></p>
+        </div>
+      <% } %>
+    <% }) %>
+    <% } %>
+  </div>
+  <form id="chat-form">
+    <input id="msg" type="text" name="message" />
+    <input type="submit" name="send" value="Enviar" />
+  </form>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/chat.js"></script>
+</body>
+</html>
