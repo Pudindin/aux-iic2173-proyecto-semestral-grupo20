@@ -106,7 +106,7 @@ router.post('/signup', async (req, res) => {
       let user = await orm.user.build(req.body.data.attributes);
       await user.save({ fields: ['username', 'email', 'password'] });
       user = await orm.user.findOne({ where: { email } });
-      user.username = username + user.id;
+      user.username = `${username}#${user.id}`;
       await user.save({ fields: ['username'] });
       // We create the cookie containing the access token
       const token = await new Promise((resolve, reject) => {
