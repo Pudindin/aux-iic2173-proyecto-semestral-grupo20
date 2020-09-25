@@ -6,7 +6,7 @@ services:
     volumes:
       - ./pg-init-scripts:/docker-entrypoint-initdb.d
     env_file:
-        - ./pg-init-scripts/data-base.env
+      - ./pg-init-scripts/data-base.env
     networks:
       - node-pg-connect
 
