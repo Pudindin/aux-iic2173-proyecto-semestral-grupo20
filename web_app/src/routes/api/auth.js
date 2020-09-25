@@ -2,7 +2,9 @@ const express = require('express');
 const jwtgenerator = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Hashids = require('hashids/cjs');
+
 const hashids = new Hashids(process.env.HASH_ID, 10);
+
 const { ValidationError } = require('sequelize');
 require('dotenv').config();
 const orm = require('../../models');
