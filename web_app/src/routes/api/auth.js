@@ -44,7 +44,13 @@ router.post('/signin', async (req, res) => {
         );
       });
       res.send({
-        data: null,
+        data: {
+          type: 'users',
+          attributes: {
+            username: user.username,
+            email: user.email,
+          },
+        },
         meta: {
           access_token: token,
           token_type: 'Bearer',
@@ -118,7 +124,13 @@ router.post('/signup', async (req, res) => {
       });
       res.status = 201;
       res.send({
-        data: null,
+        data: {
+          type: 'users',
+          attributes: {
+            username: user.username,
+            email: user.email,
+          },
+        },
         meta: {
           access_token: token,
           token_type: 'Bearer',

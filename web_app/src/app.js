@@ -1,11 +1,13 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const routes = require('./routes');
 
 // Constructor
 const app = express();
 
+app.use(cors());
 // Setting bodyparser
 app.use(bodyParser.urlencoded({ extended: true }));
 
