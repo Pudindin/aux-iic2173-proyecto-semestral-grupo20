@@ -6,7 +6,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     const adminUsers = [
       {
-        username: 'dhvasquez',
+        username: 'dhvasquez#1',
         email: 'dhvasquez@uc.cl',
         password: bcrypt.hashSync('123', PASSWORD_SALT),
         createdAt: new Date(),

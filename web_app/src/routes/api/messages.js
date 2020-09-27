@@ -28,6 +28,11 @@ function jsonSerializer(type, options) {
   return new jsonApiSerializer.Serializer(type, options);
 }
 
+function checkMention(message) {
+  const re = /^@.*#[0-9]*/g;
+  return re.test(message);
+}
+
 router.get('/', authenticateToken, async (req, res) => {
   const user = await orm.user.findByPk(req.userId[0]);
   try {
@@ -97,19 +102,42 @@ router.post('/', authenticateToken, async (req, res) => {
       res.status = 404;
       throw new ValidationError('Not Found', ['room provided doesn\'t exist']);
     } else {
+      let mentionedUser = null;
+      if (checkMention(req.body.data.attributes.message)) {
+        const myRegexp = /^@.*#[0-9]*/g;
+        const match = myRegexp.exec(req.body.data.attributes.message);
+        mentionedUser = await orm.user.findOne(
+          {
+            where: { username: match[0].replace('@', '') },
+          },
+        );
+        console.log(mentionedUser);
+      }
       const message = await orm.message.build(req.body.data.attributes);
       message.userId = user.id;
       await message.save({ fields: ['message', 'roomId', 'userId'] });
       // Send the response
       message.user = user;
       res.statusCode = 201;
-      const responseBody = jsonSerializer('message', {
+      let responseBody = jsonSerializer('message', {
         attributes: ['message', 'createdAt', 'user'],
         user: {
           ref: 'id',
           attributes: ['username'],
         },
       }).serialize(message);
+
+      // Here we should manage email sender
+      if (mentionedUser) {
+        message.mentionUser = `Sending email to ${mentionedUser.username}`;
+        responseBody = jsonSerializer('message', {
+          attributes: ['message', 'createdAt', 'user', 'mentionUser'],
+          user: {
+            ref: 'id',
+            attributes: ['username'],
+          },
+        }).serialize(message);
+      }
       res.send(responseBody);
     }
   } catch (validationError) {
