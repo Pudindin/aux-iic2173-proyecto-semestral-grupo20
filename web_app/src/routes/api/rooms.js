@@ -1,14 +1,13 @@
 const express = require('express');
 const jwtgenerator = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const Hashids = require('hashids/cjs');
 const jsonApiSerializer = require('jsonapi-serializer');
-
-const hashids = new Hashids(process.env.HASH_ID, 10);
 const { ValidationError } = require('sequelize');
 require('dotenv').config();
+
 const orm = require('../../models');
 
+const hashids = new Hashids(process.env.HASH_ID, 10);
 const router = express.Router();
 
 function authenticateToken(req, res, next) {
@@ -28,7 +27,7 @@ function authenticateToken(req, res, next) {
 
 function jsonSerializer(type, options) {
   return new jsonApiSerializer.Serializer(type, options);
-};
+}
 
 router.get('/', authenticateToken, async (req, res) => {
   const user = await orm.user.findByPk(req.userId[0]);
@@ -67,7 +66,7 @@ router.post('/', authenticateToken, async (req, res) => {
       const room = await orm.room.build({ name });
       await room.save({ fields: ['name'] });
       // Send the response
-      res.status = 201;
+      res.statusCode = 201;
       res.send({
         links: {
           self: '/api/rooms/',
@@ -87,7 +86,7 @@ router.post('/', authenticateToken, async (req, res) => {
       validationError.message = 'Bad Request';
       validationError.errors = ['Empty or invalid request data'];
     }
-    res.status = res.status;
+    res.statusCode = res.status;
     res.send({
       errors: [
         {
