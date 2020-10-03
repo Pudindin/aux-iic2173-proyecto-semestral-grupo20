@@ -7,7 +7,7 @@ require('dotenv').config();
 const orm = require('../../models');
 
 const hashids = new Hashids(process.env.HASH_ID, 10);
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
@@ -36,7 +36,12 @@ function checkMention(message) {
 router.get('/', authenticateToken, async (req, res) => {
   const user = await orm.user.findByPk(req.userId[0]);
   try {
-    const { roomId } = req.query;
+    let roomId;
+    if (req.query.roomId) {
+      roomId = req.query.roomId;
+    } else if (req.params.roomId) {
+      roomId = req.params.roomId;
+    }
     if (!roomId) {
       res.status = 422;
       throw new ValidationError('Unprocessable Entity', ['No room provided']);
@@ -94,7 +99,10 @@ router.get('/', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, async (req, res) => {
   const user = await orm.user.findByPk(req.userId[0]);
   try {
-    const checkRoom = await orm.room.findByPk(req.body.data.attributes.roomId);
+    let checkRoom = await orm.room.findByPk(req.body.data.attributes.roomId);
+    if (req.params.roomId) {
+      checkRoom = await orm.room.findByPk(req.params.roomId);
+    }
     if (req.body.data.type !== 'messages') {
       res.status = 406;
       throw new ValidationError('Not Acceptable', ['Invalid type of request']);

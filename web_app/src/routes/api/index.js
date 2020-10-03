@@ -10,5 +10,6 @@ const router = express.Router();
 router.use('/auth', authApi);
 router.use('/rooms', roomsApi);
 router.use('/messages', messagesApi);
+router.use('/rooms/:roomId/messages', messagesApi);
 
 module.exports = router;
