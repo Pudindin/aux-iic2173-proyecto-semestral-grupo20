@@ -100,4 +100,33 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const room = await orm.room.findByPk(id);
+    if (!room) {
+      throw new ValidationError();
+    }
+    const responseBody = jsonSerializer('room', {
+      attributes: ['name'],
+      topLevelLinks: {
+        self: `/api/rooms/${req.params.id}`,
+      },
+    }).serialize(room);
+    res.send(responseBody);
+  } catch (validationError) {
+    res.statusCode = 404;
+    res.send({
+      errors: [
+        {
+          status: res.status,
+          source: `/api/rooms/${req.params.id}`,
+          message: `Room with id ${req.params.id} is not registered in the database`,
+          error: 'Room doesn\'t exists',
+        },
+      ],
+    });
+  }
+});
+
 module.exports = router;

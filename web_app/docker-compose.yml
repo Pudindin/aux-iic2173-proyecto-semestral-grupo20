@@ -61,7 +61,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/dhvasquez/Documentos/iic2173-e0-dhvasquez/web_app/src/public/
+      device: ./web_app/src/public/
       o: bind
 
 networks:

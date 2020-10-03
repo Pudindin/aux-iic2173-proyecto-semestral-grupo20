@@ -1,5 +1,6 @@
 #!/bin/sh
 
-npx sequelize-cli db:migrate
+yarn sequelize db:migrate
+yarn sequelize db:seed:all
 
 npm start
