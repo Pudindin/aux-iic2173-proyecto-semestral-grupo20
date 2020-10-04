@@ -16,10 +16,7 @@ function authenticateToken(req, res, next) {
   if (token == null) return res.sendStatus(401);
 
   jwtgenerator.verify(token, process.env.JWT_SECRET, (err, data) => {
-    console.log(err);
-    console.log('---------------');
     if (err) return res.sendStatus(403);
-    console.log(data.userId);
     req.userId = hashids.decode(data.userId);
     next();
   });
