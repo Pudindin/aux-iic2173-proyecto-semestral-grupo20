@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>My chat room</title>
+  <title>E1 - ChatRoom</title>
   <meta name="description" content="Chat room">
   <meta name="author" content="Diego Vásquez">
 
@@ -13,36 +13,9 @@
 </head>
 
 <body>
-  <h1>Chat Entrega 0</h1>
+  <h1>REST Api, chatRoom</h1>
   <h3>Curso: Arquitectura de Sistemas de Software</h3>
-  <h3>Nombre: Diego Vásquez</h3>
-  <div class="form-container">
-    <form action="<%= submitUsernamePath %>" method="post">
-      <div class="field">
-        <label for="username">Nombre de usuario: </label>
-        <input type="text" name="username" placeholder="Username" />
-      </div>
-      <div class="field">
-        <input id="room-question" type="checkbox" name="newroom" value="new-room">
-        <label for="newroom">Nueva Sala</label>
-        <input id="checkValue" name="newroomvalue" type="hidden" value="false" />
-      </div>
-      <div id="create-room" class="field">
-        <label for="newroomname">Nombre de nueva Sala: </label>
-        <input type="text" name="newroomname" placeholder="Name of the room" />
-      </div>
-      <div id="select-room" class="field">
-        <label for="room">Seleccione la Sala: </label>
-        <select id="existing-rooms" name="room">
-          <% roomsList.forEach((room) =>{ %>
-            <option><%= room.name %></option>
-          <% }) %>
-        </select>
-      </div>
-      <div  class="field">
-        <input type="submit" name="join" value="Enviar" />
-    </form>
-  </div>
+  <h3>Grupo 20</h3>
   <script src="/js/scripts.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 DB_USERNAME=<databaseusername>
 DB_PASSWORD=<databaseuserpassword>
 DB_NAME=<databasename>
-DB_HOST=<postgres_db>
+DB_HOST=postgres_db
 JWT_SECRET=<secret hash>
 HASH_ID=<secret hash>
 ```
@@ -13,5 +13,5 @@ HASH_ID=<secret hash>
 ```
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
-POSTGRES_MULTIPLE_DATABASES="<databasename>,<databaseusername>,<databaseuserpassword>"
+POSTGRES_MULTIPLE_DATABASES=<databasename>,<databaseusername>,<databaseuserpassword>
 ```
