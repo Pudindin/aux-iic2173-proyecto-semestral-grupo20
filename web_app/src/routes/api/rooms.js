@@ -29,6 +29,8 @@ function jsonSerializer(type, options) {
 router.get('/', authenticateToken, async (req, res) => {
   const user = await orm.user.findByPk(req.userId[0]);
   const roomsList = await orm.room.findAll();
+  console.log("ESTOS SON LOS ROOMS")
+  console.log(roomsList)
   const responseBody = jsonSerializer('room', {
     attributes: ['name'],
     topLevelLinks: {

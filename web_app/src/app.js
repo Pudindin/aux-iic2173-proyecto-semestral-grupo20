@@ -33,6 +33,14 @@ app.use((req, res, next) => {
 // Setting routes
 app.use('', routes);
 
-//
+// Setting redis
+var redis = require('redis');
+var client = redis.createClient('6379', '34.224.111.177');
+client.on('connect', function() {
+  console.log('REDIS connected !!!');
+})
+client.set('test1', 'value', function(err, reply) {
+  console.log(reply);
+});
 
 module.exports = app;
