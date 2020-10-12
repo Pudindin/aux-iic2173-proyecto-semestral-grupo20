@@ -2,7 +2,9 @@ const express = require('express');
 const jwtgenerator = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Hashids = require('hashids/cjs');
+
 const hashids = new Hashids(process.env.HASH_ID, 10);
+
 const { ValidationError } = require('sequelize');
 require('dotenv').config();
 const orm = require('../../models');
@@ -44,7 +46,13 @@ router.post('/signin', async (req, res) => {
         );
       });
       res.send({
-        data: null,
+        data: {
+          type: 'users',
+          attributes: {
+            username: user.username,
+            email: user.email,
+          },
+        },
         meta: {
           access_token: token,
           token_type: 'Bearer',
@@ -59,6 +67,7 @@ router.post('/signin', async (req, res) => {
     if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
       res.status = 400;
     }
+    res.statusCode = res.status;
     res.send({
       errors: [
         {
@@ -116,9 +125,15 @@ router.post('/signup', async (req, res) => {
           (err, tokenResult) => (err ? reject(err) : resolve(tokenResult)),
         );
       });
-      res.status = 201;
+      res.statusCode = 201;
       res.send({
-        data: null,
+        data: {
+          type: 'users',
+          attributes: {
+            username: user.username,
+            email: user.email,
+          },
+        },
         meta: {
           access_token: token,
           token_type: 'Bearer',
@@ -135,7 +150,7 @@ router.post('/signup', async (req, res) => {
       validationError.message = 'Bad Request';
       validationError.errors = ['Empty or invalid request data'];
     }
-    res.status = res.status;
+    res.statusCode = res.status;
     res.send({
       errors: [
         {

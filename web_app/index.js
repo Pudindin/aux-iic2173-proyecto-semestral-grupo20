@@ -46,53 +46,34 @@ db.sequelize
 
       // Work with sockets
       io.on('connection', (socket) => {
-        // When user connects
+        console.log('---------------');
+        console.log('New client connected');
+        // Client connection
         socket.on('joinRoom', (msg) => {
-          const user = msg.username;
-          const { room } = msg;
-          // join room
-          socket.join(room);
-
-          // Emit a welcome app
-          socket.emit(
-            'message',
-            { username: user, text: `Bienvenido a ${room}` },
-          );
-
-          // Broadcoast when user connects
-          socket.broadcast
-            .to(room)
-            .emit(
-              'message',
-              { username: user, text: `Usuario ${user} se ha unido a ${room}` },
-            );
+          const { user, room } = msg;
+          console.log('-----------');
+          console.log(`${user.username} se ha conectado a la sala ${room.name}`);
+          // Join room
+          socket.join(room.name);
         });
 
         // Recieve message
         socket.on('chatMessage', async (msg) => {
-          const user = msg.username;
-          const room = await db.room.findOne({ where: { name: msg.room } });
-
-          // Save to the database
-          const message = await db.message.build({
-            user,
-            message: msg.msg,
-            roomId: room.id,
-          });
-          await message.save({ fields: ['user', 'message', 'roomId'] });
-
-          // Emit the message to other users
+          console.log('-----------');
+          console.log(`message recieve, broadcasting to ${msg.room.name}`);
+          // broadcast message to same room
           socket.broadcast
-            .to(room.name)
+            .to(msg.room.name)
             .emit(
               'message',
-              { username: user, text: message.message, date: formatDate(message.createdAt) },
+              { user: msg.user, message: msg.message },
             );
         });
 
-        // Handle disconnect
-        socket.on('disconnect', (msg) => {
-          console.log(msg);
+        // Client disconnect
+        socket.on('disconnect', () => {
+          console.log('-------------');
+          console.log('Client disconnected');
         });
       });
 
@@ -100,3 +81,5 @@ db.sequelize
     });
   })
   .catch((err) => console.error('Unable to connect to the database:', err));
+
+module.exports = server;

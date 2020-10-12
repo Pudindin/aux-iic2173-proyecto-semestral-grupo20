@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "UserMention",
+    "SubjectPart": "You have been mentioned!",
+    "HtmlPart": "<h1>Hello {{reciever_name}}!,</h1><p>{{user_name}} has mentioned you in chatroom {{room_name}}.</p>",
+    "TextPart": "Hello {{reciever_name}}!,\r\n{{user_name}} has mentioned you in chatroom {{room_name}}."
+  }
+}

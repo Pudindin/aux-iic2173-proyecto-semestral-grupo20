@@ -29,11 +29,7 @@ function formatDate(dateParam) {
 }
 
 router.get('/', async (req, res) => {
-  const roomsList = await orm.room.findAll();
-  res.render('index', {
-    roomsList,
-    submitUsernamePath: `${req.path}join`,
-  });
+  res.render('index');
 });
 
 router.post('/join', async (req, res) => {
