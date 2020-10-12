@@ -6,6 +6,43 @@ const { ValidationError } = require('sequelize');
 require('dotenv').config();
 const orm = require('../../models');
 
+// AWS configuration
+const aws = require('aws-sdk');
+const ses = new aws.SES({
+  accessKeyId: process.env.AWS_ACCES_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: 'us-east-2'
+})
+
+async function sendEmail(data) {
+  const { reciever_name, reciever_email, user_name, room_name } = data;
+  const templateData = {
+    reciever_name: reciever_name,
+    user_name: user_name,
+    room_name: room_name,
+  };
+  const template_params = {
+    Source: 'chatapp.ass.grupo20@gmail.com',
+    Destination: {
+      'ToAddresses': [reciever_email]
+    },
+    Template: 'UserMention',
+    TemplateData: JSON.stringify(templateData)
+  };
+  // Send email
+  const response = await ses.sendTemplatedEmail(template_params).promise();
+  return response;
+}
+
+//const params = {
+//  user_name: 'Bruce Wayne',
+//  reciever_name: 'Diego',
+//  reciever_email: 'chatapp.ass.grupo20@gmail.com',
+//  room_name: 'Comicon'
+//};
+//sendEmail(params);
+
+
 const hashids = new Hashids(process.env.HASH_ID, 10);
 const router = express.Router({ mergeParams: true });
 
@@ -116,7 +153,6 @@ router.post('/', authenticateToken, async (req, res) => {
             where: { username: match[0].replace('@', '') },
           },
         );
-        console.log(mentionedUser);
       }
       const message = await orm.message.build(req.body.data.attributes);
       message.userId = user.id;
@@ -135,6 +171,13 @@ router.post('/', authenticateToken, async (req, res) => {
       // Here we should manage email sender
       if (mentionedUser) {
         message.mentionUser = `Sending email to ${mentionedUser.username}`;
+        const email_params = {
+          user_name: user.username,
+          reciever_name: mentionedUser.username,
+          reciever_email: mentionedUser.email,
+          room_name: checkRoom.name
+        };
+        await sendEmail(email_params);
         responseBody = jsonSerializer('message', {
           attributes: ['message', 'createdAt', 'user', 'mentionUser'],
           user: {
