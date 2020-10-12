@@ -28,9 +28,24 @@ function jsonSerializer(type, options) {
 
 router.get('/', authenticateToken, async (req, res) => {
   const user = await orm.user.findByPk(req.userId[0]);
-  const roomsList = await orm.room.findAll();
-  console.log("ESTOS SON LOS ROOMS")
-  console.log(roomsList)
+  let redisResponse;
+  let roomsList;
+  await new Promise((resolve, reject) => {
+    redisClient.get('rooms', function(err, reply) {
+      redisResponse = reply;
+      resolve();
+    });
+  });
+  if (redisResponse != null) {
+    roomsList = JSON.parse(redisResponse);
+    console.log("Redis tiene los rooms !");
+  }
+  else{
+    roomsList = await orm.room.findAll();
+    redisClient.set('rooms', JSON.stringify(roomsList), 'EX', 10, function(err, reply) {
+    });
+    console.log("Redis NO tiene los rooms ! :(");
+  }
   const responseBody = jsonSerializer('room', {
     attributes: ['name'],
     topLevelLinks: {
