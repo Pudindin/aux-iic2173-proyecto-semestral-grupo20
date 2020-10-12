@@ -20,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.3.2",
     "pg-hstore": "^2.3.3",
+    "redis": "^3.0.2",
     "request": "^2.88.2",
     "sequelize": "^6.3.4",
     "sequelize-cli": "^6.2.0",
