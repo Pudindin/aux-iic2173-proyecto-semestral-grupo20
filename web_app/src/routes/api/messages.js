@@ -138,6 +138,9 @@ router.get('/fast', authenticateToken, async (req, res) => {
         resolve();
       });
     });
+    if (!messagesList) {
+      messagesList = [];
+    }
     const responseBody = jsonSerializer('message', {
       attributes: ['message', 'createdAt', 'user'],
       user: {
