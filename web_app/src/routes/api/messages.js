@@ -119,6 +119,56 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/fast', authenticateToken, async (req, res) => {
+  try {
+    let roomId;
+    if (req.query.roomId) {
+      roomId = req.query.roomId;
+    } else if (req.params.roomId) {
+      roomId = req.params.roomId;
+    }
+    if (!roomId) {
+      res.status = 422;
+      throw new ValidationError('Unprocessable Entity', ['No room provided']);
+    }
+    let messagesList = [];
+    await new Promise((resolve, reject) => {
+      redisClient.get(`${roomId}`, (err, reply) => {
+        messagesList = JSON.parse(reply);
+        resolve();
+      });
+    });
+    const responseBody = jsonSerializer('message', {
+      attributes: ['message', 'createdAt', 'user'],
+      user: {
+        ref: 'id',
+        attributes: ['username'],
+      },
+      topLevelLinks: {
+        self: '/api/messages',
+      },
+    }).serialize(messagesList);
+    res.send(responseBody);
+  } catch (validationError) {
+    if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
+      res.status = 400;
+      validationError.message = 'Bad Request';
+      validationError.errors = ['Empty or invalid request data'];
+    }
+    res.statusCode = res.status;
+    res.send({
+      errors: [
+        {
+          status: res.status,
+          source: '/api/messages/',
+          message: validationError.message,
+          error: validationError.errors,
+        },
+      ],
+    });
+  }
+});
+
 /*
 {
   "data": {
@@ -156,7 +206,23 @@ router.post('/', authenticateToken, async (req, res) => {
       }
       const message = await orm.message.build(req.body.data.attributes);
       message.userId = user.id;
+      message.roomId = checkRoom.id;
       await message.save({ fields: ['message', 'roomId', 'userId'] });
+      // save on redis
+      const messagesList = await orm.message.findAll(
+        {
+          limit: 10,
+          where: { roomId: checkRoom.id },
+          include: {
+            model: orm.user,
+            attributes: ['id', 'username', 'email'],
+          },
+          order: [[ 'createdAt', 'DESC' ]],
+        },
+      );
+      redisClient.set(`${checkRoom.id}`, JSON.stringify(messagesList));
+      console.log('posteado');
+      console.log(JSON.stringify(messagesList));
       // Send the response
       message.user = user;
       res.statusCode = 201;
