@@ -1,7 +1,11 @@
 # IIC2173 - Entrega 1 - Levantando clusters hechos por estudiantes de arquitectura de sistemas de software
 
 ## Consideraciones generales
-La documentación se encuentra al final de este README y en el archivo `Documentación E1 grupo 20.pdf`, en el directorio raíz del repo, y [aquí](https://github.com/iic2173/iic2173-proyecto-semestral-grupo20/blob/master/Documentaci%C3%B3n%20E1%20grupo%2020.pdf)
+La documentación se encuentra al final de este README y en el archivo `Documentación E1 grupo 20.pdf`, en el directorio raíz del repo, y [aquí](https://github.com/iic2173/iic2173-proyecto-semestral-grupo20/blob/master/Documentaci%C3%B3n%20E1%20grupo%2020.pdf).
+
+La api se puede encontrar en open-chat-api.tk.
+
+El frontend se puede encontrar en open-chat.ml.
 
 ## Método de acceso
 El método de acceso elegido fue mediante ssh utilizando una clave, en específico, el archivo ```allsshinstance.pem``` para las instancias de backend y base de datos.
