@@ -77,7 +77,7 @@ La documentación se encuentra al final de este archivo.
 
 ## Documentación
 
-### Endpoints HTTP del backend
+### Backend
 Para el Backend se utilizo expressJS + socket.IO, y para la autenticación se implmento JWT. Es full REST api siguiendo la especificación [JSON:API](https://jsonapi.org/) para las respuestas entregadas, y utilizando React para consumir dicha Api.
 Sus endpoints son:
 - https://open-chat-api.tk/api/auth/signin => método POST para iniciar sesión
@@ -97,7 +97,7 @@ Se implementó a través de AWS Cloudfront y AWS S3. Toda la página se encuentr
 El CDN se implementó con AWS Cloudfront y AWS S3, y actualmente todo el frontend se encuentra hosteado ahí, en un bucket llamado openchat. Desde ahí se consume el frontend, y los assets de este se consumen desde otro CDN, también con AWS Cloudfront y AWS S3, en un bucket llamado e1g20 donde se encuentran las imágenes, como el favicon y el logo, y también el archivo css.
 
 ### Backend y Load Balancer
-El backend se implementó dentro de una instancia de AWS EC2 con docker-compose, desde la cual se conecta a Redis y a la BD.
+El backend se implementó dentro de una instancia de AWS EC2 con docker-compose, desde la cual se conecta a Redis y a la BD. Para iniciar docker-compose se creo un servicio aplicado al sistema init de la instancia.
 
 Además, un load balancer se encarga de replicar la instancia en caso de que el uso de la CPU supere el 50% y, posteriormente, elige a qué instancia dirigir una llamada a la api.
 
