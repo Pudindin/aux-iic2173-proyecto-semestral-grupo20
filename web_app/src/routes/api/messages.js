@@ -224,8 +224,6 @@ router.post('/', authenticateToken, async (req, res) => {
         },
       );
       redisClient.set(`${checkRoom.id}`, JSON.stringify(messagesList));
-      console.log('posteado');
-      console.log(JSON.stringify(messagesList));
       // Send the response
       message.user = user;
       res.statusCode = 201;
