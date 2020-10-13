@@ -77,6 +77,19 @@ La documentación se encuentra al final de este archivo.
 
 ## Documentación
 
+### Endpoints HTTP del backend
+Para el Backend se utilizo expressJS + socket.IO, y para la autenticación se implmento JWT. Es full REST api siguiendo la especificación [JSON:API](https://jsonapi.org/) para las respuestas entregadas, y utilizando React para consumir dicha Api.
+Sus endpoints son:
+- https://open-chat-api.tk/api/auth/signin => método POST para iniciar sesión
+- https://open-chat-api.tk/api/auth/signup => método POST para registrarse sesión
+- https://open-chat-api.tk/api/rooms/ => método GET que retorna las salas solo si se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/ => método POST que crea una sala solo si no existe y se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:id => método GET que retorna detalle de la sala con id ":id", solo si se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages => método GET que retorna los mensajes de la sala "roomId", y solo si se le otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages/fast => método GET que retorna los ultimos 10 mensajes de la sala "roomId" buscandolo en cache, y solo si se le otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages => método POST que crea un mensaje en la sala "roomId", y solo si se le otorga un JWT.
+
+
 ### Frontend
 Se implementó a través de AWS Cloudfront y AWS S3. Toda la página se encuentra en un bucket y es servida a través de un CDN en su totalidad
 
