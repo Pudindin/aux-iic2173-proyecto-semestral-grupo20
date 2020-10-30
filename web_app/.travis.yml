@@ -1,0 +1,13 @@
+language: node_js
+
+node_js:
+  - 7
+
+services:
+  - docker
+
+install:
+  - docker-compose build
+
+script:
+  - echo "no hay tests"
