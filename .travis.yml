@@ -1,10 +1,16 @@
 language: node_js
 
-node_js:
-  - 7
-
 services:
   - docker
 
+before_install:
+  - cd web_app
+
+install:
+  - docker-compose build
+
 script:
   - echo "no hay tests"
+
+after_install:
+  - echo "nada aún"
