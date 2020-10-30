@@ -1,13 +1,14 @@
 language: node_js
 
+branches:
+  only:
+    - master
+
 node_js:
   - 7
 
 services:
   - docker
-
-install:
-  - docker-compose build
 
 script:
   - echo "no hay tests"
