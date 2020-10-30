@@ -5,6 +5,8 @@ services:
 
 before_install:
   - cd web_app
+  - touch pg-init-scripts/data-base.env
+  - touch .env
 
 install:
   - docker-compose build
@@ -13,4 +15,4 @@ script:
   - echo "no hay tests"
 
 after_install:
-  - echo "nada aún"
+  - echo "nada por ahora"
