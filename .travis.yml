@@ -19,4 +19,5 @@ script:
 
 after_success:
   - docker --version
-  - docker-compose exec web npm run semantic-release
+  - git --version
+  - docker-compose exec web yarn run semantic-release

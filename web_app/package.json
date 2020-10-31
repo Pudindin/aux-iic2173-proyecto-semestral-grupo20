@@ -23,6 +23,7 @@
     "redis": "^3.0.2",
     "request": "^2.88.2",
     "semantic-release": "^17.2.2",
+    "semantic-versioning": "^1.0.2",
     "sequelize": "^6.3.4",
     "sequelize-cli": "^6.2.0",
     "socket.io": "^2.3.0"
@@ -35,6 +36,9 @@
     "nodemon": "^2.0.4"
   },
   "release": {
-    "branches": ["master", "agregar-ci-cd"]
+    "branches": [
+      "master",
+      "agregar-ci-cd"
+    ]
   }
 }
