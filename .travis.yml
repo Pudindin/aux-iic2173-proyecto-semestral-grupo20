@@ -10,9 +10,14 @@ before_install:
 
 install:
   - docker-compose build
+  - install git
 
 script:
   - echo "no hay tests"
+  - zip -r latest *
+  - mkdir -p dpl_cd_upload
+  - mv latest.zip dpl_cd_upload
 
-after_install:
-  - echo "nada por ahora"
+after_success:
+  - docker --version
+  - npx semantic-release
