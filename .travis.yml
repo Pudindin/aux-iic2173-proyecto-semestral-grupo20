@@ -12,6 +12,7 @@ before_install:
 install:
   - docker-compose build
   - yarn add semantic-release
+  - apt install python3-pip
 
 script:
   - echo "pronto, los tests"
@@ -24,6 +25,7 @@ after_success:
   - git --version
   - yarn run semantic-release # semantic versioning
   - pip install --user awscli # install aws cli w/o sudo
+  - python -m pip install --upgrade awscli #update aws cli
   - aws --version
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
   - eval $(aws ecr get-login --region us-east-2) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
