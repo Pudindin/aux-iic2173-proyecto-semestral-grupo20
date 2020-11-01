@@ -46,6 +46,7 @@ deploy:
   - provider: codedeploy
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
+    region: us-east-2
     key: latest/latest.zip
     bucket: "openchat-deploy-from-travis"
     bundle_type: zip
