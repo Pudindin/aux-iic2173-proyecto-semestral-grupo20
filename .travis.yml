@@ -5,6 +5,7 @@ services:
 
 before_install:
   - cd web_app
+  - nvm install 12.19.0
   - touch pg-init-scripts/data-base.env
   - touch .env
 
