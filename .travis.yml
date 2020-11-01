@@ -24,6 +24,7 @@ after_success:
   - git --version
   - yarn run semantic-release # semantic versioning
   - pip install --user awscli # install aws cli w/o sudo
+  - aws --version
   - export PATH=$PATH:$HOME/.local/bin # put aws in the path
   - eval $(aws ecr get-login --region us-east-2) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
   - docker build -t ass_g20 .
@@ -39,6 +40,8 @@ deploy:
     bucket: "openchat-deploy-from-travis"
     region: us-east-2
     upload_dir: latests
+    on:
+      branch: agregar-ci-cd
   - provider: codedeploy
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
