@@ -36,7 +36,7 @@ deploy:
     local_dir: dpl_cd_upload
     bucket: "openchat-deploy-from-travis"
     region: us-east-2
-    upload_dir: latests
+    upload_dir: latest
     skip_cleanup: true
     on:
       branch: agregar-ci-cd
