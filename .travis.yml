@@ -41,19 +41,13 @@ deploy:
     bucket: "openchat-deploy-from-travis"
     region: us-east-2
     upload_dir: latests
-    on:
-      branch: agregar-ci-cd
+    skip_cleanup: true
   - provider: codedeploy
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
-    local_dir: dpl_cd_upload
-    bucket: "openchat-deploy-from-travis"
-    region: us-east-2
-    upload_dir: latests
     key: latest/latest.zip
+    bucket: "openchat-deploy-from-travis"
     bundle_type: zip
     application: openchat
     deployment_group: openchat-deploy
     wait_until_deployed: true
-    on:
-      branch: agregar-ci-cd
