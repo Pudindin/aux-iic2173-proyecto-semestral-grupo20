@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+
+files:
+  - source: scripts
+  - destination: iic2173-proyecto-semestral-grupo20/web_app
+
+permissions:
+  - object: scripts
+    pattern: "**"
+    owner: ec2-user
+
+hooks:
+  ApplicationStop:
+    - location: stop.sh
+      timeout: 600
+      runas: ec2-user
+  AfterInstall:
+    - location: install.sh
+      timeout: 600
+      runas: ec2-user
+  ApplicationStart:
+    - location: start.sh
+      timeout: 600
+      runas: ec2-user

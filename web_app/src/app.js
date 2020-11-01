@@ -38,7 +38,7 @@ app.use('', routes);
 var redis = require('redis');
 redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_IP);
 redisClient.on('connect', function() {
-  console.log('Redis connected !!!');
+console.log('Redis connected !!!');
 })
 redisClient.set('test1', 'value', function(err, reply) {
 });
