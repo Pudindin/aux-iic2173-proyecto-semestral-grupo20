@@ -13,6 +13,7 @@ install:
   - yarn add semantic-release
 
 script:
+  - echo "pronto, los tests"
   - zip -r latest *
   - mkdir -p dpl_cd_upload
   - mv latest.zip dpl_cd_upload
@@ -20,4 +21,31 @@ script:
 after_success:
   - docker --version
   - git --version
-  - yarn run semantic-release
+  - yarn run semantic-release # semantic versioning
+  - pip install --user awscli # install aws cli w/o sudo
+  - export PATH=$PATH:$HOME/.local/bin # put aws in the path
+  - eval $(aws ecr get-login --region us-east-2) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - docker build -t ass_g20 .
+  - docker tag ass_g20:latest 161618437221.dkr.ecr.us-east-2.amazonaws.com/ass_g20:latest
+  - docker push 161618437221.dkr.ecr.us-east-2.amazonaws.com/ass_g20:latest
+  - docker images
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    local_dir: dpl_cd_upload
+    bucket: "openchat-deploy-from-travis"
+    region: us-east-2
+    upload_dir: latests
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    bucket: "openchat-deploy-from-travis"
+    key: latest/latest.zip
+    bundle_type: zip
+    application: openchat
+    deployment_group: openchat-deploy
+    wait_until_deployed: true
+    on:
+      branch: agregar-ci-cd
