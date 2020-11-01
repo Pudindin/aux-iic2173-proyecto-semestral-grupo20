@@ -9,7 +9,7 @@ before_install:
   - touch .env
 
 install:
-  - docker-compose build -q
+  - docker-compose build
 
 script:
   - echo "pronto, los tests"
