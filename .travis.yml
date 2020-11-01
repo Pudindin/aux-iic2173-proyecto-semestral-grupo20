@@ -31,7 +31,6 @@ after_success:
   - docker tag ass_g20:latest 161618437221.dkr.ecr.us-east-2.amazonaws.com/ass_g20:latest
   - docker push 161618437221.dkr.ecr.us-east-2.amazonaws.com/ass_g20:latest
   - docker images
-  - git add dpl_cd_upload
 
 deploy:
   - provider: s3
@@ -42,6 +41,8 @@ deploy:
     region: us-east-2
     upload_dir: latests
     skip_cleanup: true
+    on:
+      branch: agregar-ci-cd
   - provider: codedeploy
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
@@ -51,3 +52,5 @@ deploy:
     application: openchat
     deployment_group: openchat-deploy
     wait_until_deployed: true
+    on:
+      branch: agregar-ci-cd
