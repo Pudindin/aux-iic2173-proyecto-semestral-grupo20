@@ -12,7 +12,7 @@ permissions:
 
 hooks:
   ApplicationStop:
-    - location: stop.sh
+    - location: /opt/codedeploy-agent/deployment-root/531f9816-3538-436e-93d6-da801e7c5195/d-4ZCP5NG36/deployment-archive/stop.sh
       timeout: 600
       runas: ec2-user
   AfterInstall:
