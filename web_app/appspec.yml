@@ -3,23 +3,23 @@ os: linux
 
 files:
   - source: scripts
-    destination: /opt/codedeploy-agent/deployment-root/531f9816-3538-436e-93d6-da801e7c5195/d-4ZCP5NG36/deployment-archive
+    destination: iic2173-proyecto-semestral-grupo20/web_app
 
 permissions:
   - object: scripts
     pattern: "**"
-    owner: ec2-user
+    owner: ubuntu
 
 hooks:
   ApplicationStop:
-    - location: /opt/codedeploy-agent/deployment-root/531f9816-3538-436e-93d6-da801e7c5195/d-4ZCP5NG36/deployment-archive/stop.sh
+    - location: stop.sh
       timeout: 600
-      runas: ec2-user
+      runas: ubuntu
   AfterInstall:
     - location: install.sh
       timeout: 600
-      runas: ec2-user
+      runas: ubuntu
   ApplicationStart:
     - location: start.sh
       timeout: 600
-      runas: ec2-user
+      runas: ubuntu
