@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source: scripts
-  - destination: iic2173-proyecto-semestral-grupo20/web_app
+    destination: iic2173-proyecto-semestral-grupo20/web_app
 
 permissions:
   - object: scripts
