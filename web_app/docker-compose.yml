@@ -24,7 +24,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-  
+
   webserver:
     image: nginx:mainline-alpine
     container_name: nginx
