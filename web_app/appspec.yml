@@ -12,7 +12,7 @@ permissions:
 
 hooks:
   ApplicationStop:
-    - location: stop.sh
+    - location: iic2173-proyecto-semestral-grupo20/web_app/stop.sh
       timeout: 600
       runas: ec2-user
   AfterInstall:
