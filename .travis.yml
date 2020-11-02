@@ -7,6 +7,7 @@ before_install:
   - cd web_app
   - touch pg-init-scripts/data-base.env
   - touch .env
+  - rm .dockerignore
 
 install:
   - docker-compose build
