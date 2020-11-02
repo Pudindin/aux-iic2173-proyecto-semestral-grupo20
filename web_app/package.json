@@ -1,6 +1,6 @@
 {
   "name": "Entrega0",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "main": "index.js",
   "author": "Diego Vásquez",
   "license": "MIT",
@@ -28,16 +28,24 @@
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
-    "nodemon": "^2.0.4"
+    "husky": "^4.3.0",
+    "nodemon": "^2.0.4",
+    "standard-version": "^9.0.0"
   },
-  "release": {
-    "branches": [
-      "master",
-      "agregar-ci-cd"
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E  HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
     ]
   }
 }
