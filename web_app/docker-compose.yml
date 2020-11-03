@@ -2,8 +2,9 @@ version: "3"
 services:
   db:
     environment:
-      POSTGRES_DB: "db"
-      POSTGRES_HOST_AUTH_METHOD: "trust"
+      POSTGRES_USER: "${POSTGRES_USER}$"
+      POSTGRES_PASSWORD: "{POSTGRES_PASSWORD}"
+      POSTGRES_MULTIPLE_DATABASES: "${POSTGRES_MULTIPLE_DATABASES}"
     container_name: "postgres_db"
     image: "postgres:12-alpine"
     volumes:
@@ -12,7 +13,7 @@ services:
       - ./pg-init-scripts/data-base.env
     networks:
       - node-pg-connect
-    
+
 
   web:
     build: .
@@ -21,6 +22,17 @@ services:
       - db
     env_file:
       - ./.env
+    enviroment:
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_NAME: "${DB_NAME}"
+      DB_HOST: "${DB_HOST}"
+      JWT_SECRET: "${JWT_SECRET}"
+      HASH_ID: "${HASH_ID}"
+      AWS_ACCES_KEY: "${AWS_ACCES_KEY}"
+      AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
+      REDIS_IP: "${REDIS_IP}"
+      REDIS_PORT: "${REDIS_PORT}"
     networks:
       - node-pg-connect
     ports:
