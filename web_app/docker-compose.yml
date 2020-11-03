@@ -1,6 +1,9 @@
 version: "3"
 services:
   db:
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     container_name: "postgres_db"
     image: "postgres:12-alpine"
     volumes:
@@ -9,6 +12,7 @@ services:
       - ./pg-init-scripts/data-base.env
     networks:
       - node-pg-connect
+    
 
   web:
     build: .
