@@ -1,7 +1,11 @@
 # IIC2173 - Entrega 1 - Levantando clusters hechos por estudiantes de arquitectura de sistemas de software
 
 ## Consideraciones generales
-La documentación se encuentra al final de este README y en el archivo `Documentación E1 grupo 20.pdf`, en el directorio raíz del repo, y [aquí](https://github.com/iic2173/iic2173-proyecto-semestral-grupo20/blob/master/Documentaci%C3%B3n%20E1%20grupo%2020.pdf)
+La documentación se encuentra al final de este README y en el archivo `Documentación E1 grupo 20.pdf`, en el directorio raíz del repo, y [aquí](https://github.com/iic2173/iic2173-proyecto-semestral-grupo20/blob/master/Documentaci%C3%B3n%20E1%20grupo%2020.pdf).
+
+La api se puede encontrar en [open-chat-api.tk](https://open-chat-api.tk).
+
+El frontend se puede encontrar en [open-chat.ml](https://open-chat.ml).
 
 ## Método de acceso
 El método de acceso elegido fue mediante ssh utilizando una clave, en específico, el archivo ```allsshinstance.pem``` para las instancias de backend y base de datos.
@@ -73,6 +77,19 @@ La documentación se encuentra al final de este archivo.
 
 ## Documentación
 
+### Backend
+Para el Backend se utilizo expressJS + socket.IO, y para la autenticación se implmento JWT. Es full REST api siguiendo la especificación [JSON:API](https://jsonapi.org/) para las respuestas entregadas, y utilizando React para consumir dicha Api.
+Sus endpoints son:
+- https://open-chat-api.tk/api/auth/signin => método POST para iniciar sesión
+- https://open-chat-api.tk/api/auth/signup => método POST para registrarse sesión
+- https://open-chat-api.tk/api/rooms/ => método GET que retorna las salas solo si se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/ => método POST que crea una sala solo si no existe y se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:id => método GET que retorna detalle de la sala con id ":id", solo si se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages => método GET que retorna los mensajes de la sala "roomId", y solo si se le otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages/fast => método GET que retorna los ultimos 10 mensajes de la sala "roomId" buscandolo en cache, y solo si se le otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages => método POST que crea un mensaje en la sala "roomId", y solo si se le otorga un JWT.
+
+
 ### Frontend
 Se implementó a través de AWS Cloudfront y AWS S3. Toda la página se encuentra en un bucket y es servida a través de un CDN en su totalidad
 
@@ -80,7 +97,7 @@ Se implementó a través de AWS Cloudfront y AWS S3. Toda la página se encuentr
 El CDN se implementó con AWS Cloudfront y AWS S3, y actualmente todo el frontend se encuentra hosteado ahí, en un bucket llamado openchat. Desde ahí se consume el frontend, y los assets de este se consumen desde otro CDN, también con AWS Cloudfront y AWS S3, en un bucket llamado e1g20 donde se encuentran las imágenes, como el favicon y el logo, y también el archivo css.
 
 ### Backend y Load Balancer
-El backend se implementó dentro de una instancia de AWS EC2 con docker-compose, desde la cual se conecta a Redis y a la BD.
+El backend se implementó dentro de una instancia de AWS EC2 con docker-compose, desde la cual se conecta a Redis y a la BD. Para iniciar docker-compose se creo un servicio aplicado al sistema init de la instancia.
 
 Además, un load balancer se encarga de replicar la instancia en caso de que el uso de la CPU supere el 50% y, posteriormente, elige a qué instancia dirigir una llamada a la api.
 
