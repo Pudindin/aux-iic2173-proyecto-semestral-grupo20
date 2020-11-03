@@ -1,0 +1,32 @@
+version: 0.0
+os: linux
+
+files:
+  - source: scripts
+    destination: /
+  - source: /
+    destination: /home/ubuntu/iic2173-proyecto-semestral-grupo20/web_app
+    overwrite: yes
+
+permissions:
+  - object: scripts
+    pattern: "**"
+    owner: ubuntu
+
+hooks:
+  ApplicationStop:
+    - location: scripts/stop.sh
+      timeout: 600
+      runas: ubuntu
+  BeforeInstall:
+    - location: scripts/cleanup.sh
+      timeout: 600
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/install.sh
+      timeout: 600
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/start.sh
+      timeout: 600
+      runas: ubuntu
