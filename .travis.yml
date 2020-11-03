@@ -5,7 +5,7 @@ branches:
   - master
 
 services:
-  - docker
+  - docker-compose
   - postgresql
 
 before_install:
