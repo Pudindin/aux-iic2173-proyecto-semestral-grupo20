@@ -22,7 +22,7 @@ services:
       - db
     env_file:
       - ./.env
-    enviroment:
+    environment:
       - DB_USERNAME="${DB_USERNAME}"
       - DB_PASSWORD="${DB_PASSWORD}"
       - DB_NAME="${DB_NAME}"
