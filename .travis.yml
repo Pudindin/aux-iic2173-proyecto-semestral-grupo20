@@ -6,6 +6,7 @@ branches:
 
 services:
   - docker
+  - postgres
 
 before_install:
   - cd web_app
