@@ -17,7 +17,7 @@ install:
   - docker-compose build
 
 script:
-  #- bash pg-init-scripts/create-multiple-database.sh
+  - bash pg-init-scripts/create-multiple-database.sh
   - echo "pronto, los tests"
   - docker-compose up
   - bash scripts/tests/test1.sh
