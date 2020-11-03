@@ -6,6 +6,7 @@ files:
     destination: /
   - source: /
     destination: /home/ubuntu/iic2173-proyecto-semestral-grupo20/web_app
+    overwrite: yes
 
 permissions:
   - object: scripts
