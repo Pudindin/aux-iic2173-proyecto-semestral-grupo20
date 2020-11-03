@@ -6,6 +6,7 @@ branches:
 
 services:
   - docker
+  - postgresql
 
 before_install:
   - cd web_app
@@ -16,7 +17,12 @@ install:
   - docker-compose build
 
 script:
+  - bash pg-init-scripts/create-multiple-database.sh
   - echo "pronto, los tests"
+  - docker-compose -f docker-compose.travis.yml up -d
+  - bash scripts/tests/test1.sh
+  - bash scripts/tests/test2.sh
+  - bash scripts/tests/test3.sh
   - rm docker-compose.yml
   - cp docker-compose.production.yml docker-compose.yml
   - zip -r latest *
