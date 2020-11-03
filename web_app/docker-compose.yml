@@ -27,12 +27,12 @@ services:
       - DB_PASSWORD="${DB_PASSWORD}"
       - DB_NAME="${DB_NAME}"
       - DB_HOST="${DB_HOST}"
-      - JWT_SECRET="${JWT_SECRET}"
-      - HASH_ID="${HASH_ID}"
+      - JWT_SECRET=${JWT_SECRET}
+      - HASH_ID=${HASH_ID}
       - AWS_ACCES_KEY="${AWS_ACCES_KEY}"
       - AWS_SECRET_KEY="${AWS_SECRET_KEY}"
-      - REDIS_IP="${REDIS_IP}"
-      - REDIS_PORT="${REDIS_PORT}"
+      - REDIS_IP=${REDIS_IP}
+      - REDIS_PORT=${REDIS_PORT}
     networks:
       - node-pg-connect
     ports:
