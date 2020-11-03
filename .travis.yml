@@ -5,7 +5,7 @@ branches:
   - master
 
 services:
-  - docker-compose
+  - docker
   - postgresql
 
 before_install:
@@ -19,7 +19,7 @@ install:
 script:
   - bash pg-init-scripts/create-multiple-database.sh
   - echo "pronto, los tests"
-  - docker-compose up
+  - docker-compose -f docker-compose.travis.yml up
   - bash scripts/tests/test1.sh
   - bash scripts/tests/test2.sh
   - bash scripts/tests/test3.sh
