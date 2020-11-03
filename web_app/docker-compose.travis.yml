@@ -29,7 +29,7 @@ services:
       - DB_HOST=${DB_HOST}
       - JWT_SECRET=${JWT_SECRET}
       - HASH_ID=${HASH_ID}
-      - AWS_ACCES_KEY=${AWS_ACCES_KEY}
+      - AWS_ACCES_KEY=${AWS_ACCESS_KEY}
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
       - REDIS_IP=${REDIS_IP}
       - REDIS_PORT=${REDIS_PORT}
