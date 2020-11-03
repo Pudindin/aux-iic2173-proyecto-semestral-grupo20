@@ -1,7 +1,7 @@
 #!/bin/bash
 
+echo "Instalando JQ"
 sudo apt-get install jq -y
-
 
 echo "Comenzando curl, probando signup correcto"
 
