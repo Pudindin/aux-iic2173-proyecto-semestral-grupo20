@@ -1,6 +1,7 @@
 #!/bin/bash
 
-sudo apt-get install jq
+sudo apt-get install jq -y
+
 
 echo "Comenzando curl, probando signup correcto"
 
