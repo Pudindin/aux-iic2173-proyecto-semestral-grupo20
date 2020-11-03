@@ -4,6 +4,8 @@ os: linux
 files:
   - source: scripts
     destination: /
+  - source: source
+    destination: /home/ubuntu/iic2173-proyecto-semestral-grupo20/web_app
 
 permissions:
   - object: scripts
