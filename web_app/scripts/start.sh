@@ -1,4 +1,7 @@
-docker-compose build
+echo $PWD
+la
 cd ..
-docker-compose build
+la
+cd ..
+la
 sudo systemctl start docker-compose-app
