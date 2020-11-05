@@ -15,10 +15,10 @@ before_install:
 
 install:
   - docker-compose build
+  - yarn add --save-dev @commitlint/config-conventional @commitlint/cli
 
 script:
   - bash pg-init-scripts/create-multiple-database.sh
-  - echo "pronto, los tests"
   - docker-compose -f docker-compose.travis.yml up -d
   - bash scripts/tests/test1.sh
   - bash scripts/tests/test2.sh
@@ -30,6 +30,8 @@ script:
   - mv latest.zip dpl_cd_upload
 
 after_success:
+  - yarn run release
+  - git push --follow-tags origin $(git branch)
   - docker --version
   - git --version
   - pip install --user awscli # install aws cli w/o sudo
