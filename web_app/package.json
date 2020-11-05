@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "release" : "standard-version",
-    "bump" : "standard-version"
+    "release": "standard-version",
+    "bump": "standard-version"
   },
   "dependencies": {
     "aws-sdk": "^2.771.0",
