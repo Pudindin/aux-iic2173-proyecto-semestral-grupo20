@@ -13,7 +13,7 @@ REDIS_IP=<redis instance ip>
 REDIS_PORT=<redis port>
 ```
 
-## pg-init-scripts/data-base.env
+## pg-init-scripts/database.env
 ```
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
