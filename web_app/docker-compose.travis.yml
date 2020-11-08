@@ -14,12 +14,20 @@ services:
     networks:
       - node-pg-connect
 
+  redis:
+    image: "redis"
+    container_name: "cache"
+    ports:
+      - "6379:6379"
+    networks:
+      - node-pg-connect
 
   web:
     build: .
     container_name: "express_app"
     depends_on:
       - db
+      - redis
     env_file:
       - ./.env
     environment:
@@ -33,6 +41,7 @@ services:
       - AWS_SECRET_KEY=${AWS_SECRET_KEY}
       - REDIS_IP=${REDIS_IP}
       - REDIS_PORT=${REDIS_PORT}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     networks:
       - node-pg-connect
     ports:
