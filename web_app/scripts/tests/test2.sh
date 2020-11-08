@@ -7,7 +7,7 @@ response=$(curl -X POST http://localhost/api/auth/signin -H 'Content-Type: appli
 echo "Respuesta de Curl"
 echo $response
 
-if [ $response == '"test1@subject.cl"' ]
+if [[ $response == '"test1@subject.cl"' ]] 
 then
   echo "success"
   exit 0
