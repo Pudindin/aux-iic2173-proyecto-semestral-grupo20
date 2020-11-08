@@ -12,12 +12,9 @@ before_install:
   - cd web_app
   - touch pg-init-scripts/data-base.env
   - touch .env
-  - nvm install 12
-  - nvm use 12
 
 install:
   - docker-compose build
-  - yarn add --save-dev @commitlint/config-conventional @commitlint/cli
 
 script:
   - bash pg-init-scripts/create-multiple-database.sh
@@ -32,8 +29,6 @@ script:
   - mv latest.zip dpl_cd_upload
 
 after_success:
-  - yarn run release
-  - git push --follow-tags https://$GITHUB_USERNAME:$GITHUB_PASSWORD@$GITHUB_URL HEAD
   - docker --version
   - git --version
   - pip install --user awscli # install aws cli w/o sudo
