@@ -33,7 +33,7 @@ script:
 
 after_success:
   - yarn run release
-  - git push --follow-tags origin $(git branch)
+  - git push --follow-tags origin HEAD
   - docker --version
   - git --version
   - pip install --user awscli # install aws cli w/o sudo
