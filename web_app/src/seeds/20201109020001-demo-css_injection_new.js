@@ -14,6 +14,7 @@ module.exports = {
         css: rules,
         roomId: 1,
         approved: false,
+        checked: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

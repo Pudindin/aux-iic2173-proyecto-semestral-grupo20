@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     roomId: DataTypes.INTEGER,
     css: DataTypes.STRING,
     approved: DataTypes.BOOLEAN,
+    checked: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'css_injection_new',

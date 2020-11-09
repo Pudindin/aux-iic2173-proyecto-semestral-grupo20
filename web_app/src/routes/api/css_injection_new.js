@@ -26,6 +26,7 @@ router.post('/', async (req, res) => {
     console.log(`RoomId :${roomId}`);
     let status = 500;
     let approved = false;
+    let checked = false;
     res.status(status);
     if (req.body.data.type !== 'csses') {
       res.status = 406;
@@ -34,8 +35,8 @@ router.post('/', async (req, res) => {
       res.status = 409;
       throw new ValidationError('Conflict', [`room with ${name} doesn't exists`]);
     } else {
-      const css_new = await orm.css_injection_new.build({ roomId, css, approved});
-      await css_new.save({ fields: ['roomId', 'css', 'approved'] });
+      const css_new = await orm.css_injection_new.build({ roomId, css, approved, checked});
+      await css_new.save({ fields: ['roomId', 'css', 'approved', 'checked'] });
       // Send the response
       res.statusCode = 201;
       res.send({
@@ -46,6 +47,7 @@ router.post('/', async (req, res) => {
             roomId: roomId,
             css: css_new.css,
             approved: approved,
+            checked: checked,
           },
         },
       });
@@ -75,10 +77,36 @@ router.get('/', async (req, res) => {
   cssList = await orm.css_injection_new.findAll();
   console.log(cssList);
   const responseBody = jsonSerializer('css', {
-    attributes: ['room_id', 'css'],
+    attributes: ['roomId', 'css', 'approved', 'checked'],
   }).serialize(cssList);
 
   res.send(responseBody);
+});
+
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const css_injection_new = await orm.css_injection_new.findByPk(id);
+    if (!css_injection_new) {
+      throw new ValidationError();
+    }
+    const responseBody = jsonSerializer('css_injection_new', {
+      attributes: ['roomId', 'css', 'approved', 'checked'],
+    }).serialize(css_injection_new);
+    res.send(responseBody);
+  } catch (validationError) {
+    res.statusCode = 404;
+    res.send({
+      errors: [
+        {
+          status: res.status,
+          source: `/css_injection_new/${req.params.id}`,
+          message: `Css injection with id ${req.params.id} is not registered in the database`,
+          error: 'Css injection doesn\'t exists',
+        },
+      ],
+    });
+  }
 });
 
 module.exports = router;
