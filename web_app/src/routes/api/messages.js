@@ -3,6 +3,7 @@ const jwtgenerator = require('jsonwebtoken');
 const Hashids = require('hashids/cjs');
 const jsonApiSerializer = require('jsonapi-serializer');
 const { ValidationError } = require('sequelize');
+const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 const orm = require('../../models');
 
@@ -43,19 +44,47 @@ async function sendEmail(data) {
 //sendEmail(params);
 
 
-const hashids = new Hashids(process.env.HASH_ID, 10);
+const hashids = new Hashids(process.env.HASH_ID);
 const router = express.Router({ mergeParams: true });
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (token == null) return res.sendStatus(401);
+  let JWT_result = true;
+  let Google_result = true;
 
   jwtgenerator.verify(token, process.env.JWT_SECRET, (err, data) => {
-    if (err) return res.sendStatus(403);
-    req.userId = hashids.decode(data.userId);
-    next();
+    if (err) {
+      JWT_result = false;
+    } else {
+      JWT_result = Buffer(hashids.decodeHex(data.userEmail), 'hex').toString('utf8');
+    }
   });
+
+  // GoogleVerification
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { email } = payload;
+    Google_result = email;
+  } catch (error) {
+    Google_result = false;
+  }
+  if (!JWT_result && !Google_result) {
+    console.log('declinados');
+    return res.sendStatus(401);
+  } else if (JWT_result) {
+    req.userEmail = JWT_result;
+    next();
+  } else {
+    req.userEmail = Google_result;
+    next();
+  }
 }
 
 function jsonSerializer(type, options) {
@@ -68,7 +97,6 @@ function checkMention(message) {
 }
 
 router.get('/', authenticateToken, async (req, res) => {
-  const user = await orm.user.findByPk(req.userId[0]);
   try {
     let roomId;
     if (req.query.roomId) {
@@ -184,7 +212,7 @@ router.get('/fast', authenticateToken, async (req, res) => {
 }
 */
 router.post('/', authenticateToken, async (req, res) => {
-  const user = await orm.user.findByPk(req.userId[0]);
+  const user = await orm.user.findOne({ where: { email: req.userEmail } });
   try {
     let checkRoom = await orm.room.findByPk(req.body.data.attributes.roomId);
     if (req.params.roomId) {

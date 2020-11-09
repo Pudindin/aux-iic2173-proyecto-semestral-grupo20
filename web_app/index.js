@@ -4,6 +4,7 @@ const http = require('http');
 const socketio = require('socket.io');
 const app = require('./src/app');
 const db = require('./src/models');
+const redisAdapter = require('socket.io-redis');
 
 const PORT = process.env.PORT || 3000;
 let server;
@@ -43,6 +44,7 @@ db.sequelize
       }
       console.log(`Listening on port ${PORT}`);
       const io = socketio(server);
+      io.adapter(redisAdapter({ host: process.env.REDIS_IP, port: process.env.REDIS_PORT }));
 
       // Work with sockets
       io.on('connection', (socket) => {
