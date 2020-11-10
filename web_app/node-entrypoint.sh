@@ -2,4 +2,4 @@
 
 yarn sequelize db:migrate
 
-yarn dev
+npm start
