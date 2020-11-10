@@ -62,13 +62,13 @@ Para el caso de Travis, se guardan como variable de entorno en travis. Las varia
 #### Documentación
 
 ##### RF1: logrado
-Se encuentra [aquí](docs/ComponentesAppE2.png)
+![](docs/ComponentesAppE2.png)
 
 ##### RF2: logrado
-Se encuentra [aquí](docs/FlujoApp.png)
+![](docs/FlujoApp.png)
 
 ##### RF3: logrado
-Se encuentra [aquí](docs/FlujoCICD.png)
+![](docs/FlujoCICD.png)
 
 ##### RF3: logrado
 Se documentó en un archivo word siguiendo el estándar de Postman; se encuentra aquí...
