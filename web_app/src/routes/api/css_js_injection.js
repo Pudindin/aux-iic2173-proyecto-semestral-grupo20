@@ -3,24 +3,25 @@ const express = require('express');
 const orm = require('../../models');
 const router = express.Router();
 const jsonApiSerializer = require('jsonapi-serializer');
+const { or, ValidationError } = require('sequelize');
 
 function jsonSerializer(type, options) {
   return new jsonApiSerializer.Serializer(type, options);
 }
 
 router.post('/', async (req, res) => {
-  const { name, type, code} = req.body.data.attributes;
+  console.log(req.body);
+  const { roomId, type, code} = req.body.data.attributes;
   console.log(res.status);
-  const checkRoom = await orm.room.findOne({ where: { name }, raw: true });
+  const checkRoom = await orm.room.findOne({ where: { id : roomId }, raw: true });
   console.log(`Room :${checkRoom.id}`);
-  let roomId = checkRoom.id;
   console.log(`RoomId :${roomId}`);
   try {
-    const { name, css } = req.body.data.attributes;
+    console.log(req.body);
+    const { roomId, type, code} = req.body.data.attributes;
     console.log(res.status);
-    const checkRoom = await orm.room.findOne({ where: { name }, raw: true });
+    const checkRoom = await orm.room.findOne({ where: { id : roomId }, raw: true });
     console.log(`Room :${checkRoom.id}`);
-    let roomId = checkRoom.id;
     console.log(`RoomId :${roomId}`);
     let status = 500;
     let approved = false;
@@ -85,7 +86,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const css_js_injection = await orm.css_js_injection.findByPk(id);
+    console.log("------------------------")
+    console.log(id);
+    const css_js_injection = await orm.css_injection_new.findOne({where: {roomId : id, approved : true, checked : true}});
+    console.log(css_js_injection);
     if (!css_js_injection) {
       throw new ValidationError();
     }
@@ -100,11 +104,45 @@ router.get('/:id', async (req, res) => {
         {
           status: res.status,
           source: `/css_js_injection/${req.params.id}`,
-          message: `Css injection with id ${req.params.id} is not registered in the database`,
+          message: `Css injection for room ${req.params.id} is not registered in the database`,
           error: 'Css injection doesn\'t exists',
         },
       ],
     });
+  }
+});
+
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { approved } = req.body
+    console.log (approved);
+    console.log(req.body);
+    const css_js_injection = await orm.css_injection_new.findOne({where: {roomId : id}})
+    console.log(css_js_injection);
+    if (!css_js_injection) {
+      throw new ValidationError();
+    }
+    css_js_injection.approved = approved; 
+    css_js_injection.checked = true;
+    await css_js_injection.save();
+    res.send(
+      {
+        "state": `succesfully updated injection to room ${id}`
+      }
+    );
+  } catch (ValidationError){
+    res.statusCode = 404;
+    res.send({
+      errors: [
+      {
+        status: res.status,
+        source: `/css_js_injection/${req.params.id}`,
+        message: `Css injection for room ${req.params.id} is not registered in the database`,
+        error: 'Css injection doesn\'t exists',
+      }
+    ],
+  });
   }
 });
 

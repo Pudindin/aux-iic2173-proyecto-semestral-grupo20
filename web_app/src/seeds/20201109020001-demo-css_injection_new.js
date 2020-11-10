@@ -3,9 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     var rules = {
-      "h1": {
-          "font-size": "1px"
-      }
+      backgroundColor: "blue"
     };
 
     rules = JSON.stringify(rules);
