@@ -73,7 +73,6 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-
   injectionList = await orm.css_injection_new.findAll();
   console.log(injectionList);
   const responseBody = jsonSerializer('css', {
@@ -115,10 +114,11 @@ router.get('/:id', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { approved } = req.body
+    const { approved } = req.body;
+    const injection_id = req.body.id;
     console.log (approved);
     console.log(req.body);
-    const css_js_injection = await orm.css_injection_new.findOne({where: {roomId : id}})
+    const css_js_injection = await orm.css_injection_new.findOne({where: {id : injection_id}})
     console.log(css_js_injection);
     if (!css_js_injection) {
       throw new ValidationError();
