@@ -5,17 +5,7 @@
 ## Consideraciones generales
 La documentación se encuentra aquí...
 
-La api se puede encontrar en [open-chat-api.tk](https://open-chat-api.tk).
-
-El frontend se puede encontrar en [open-chat.ml](https://open-chat.ml).
-
-El backend corre en instancias EC2 con un ELB y AutoScalingGroup.
-
-La base de datos se encuentra en DRS.
-
-El caché está en Elasticaché con Redis.
-
-El frontend está almacenado en un bucket de S3 y se consume desde un CDN.
+La api se puede encontrar en [open-chat-api.tk](https://open-chat-api.tk). El frontend se puede encontrar en [open-chat.ml](https://open-chat.ml). El backend corre en instancias EC2 con un ELB y AutoScalingGroup. La base de datos se encuentra en DRS. El caché está en Elasticaché con Redis. El frontend está almacenado en un bucket de S3 y se consume desde un CDN.
 
 
 ## Método de acceso
@@ -46,7 +36,7 @@ Se implementa OAuth mediante la API de GoogleAuth
 #### CI/CD
 
 ##### RF1: logrado
-El flujo se encuentra [aquí](https://github.com/IIC3745-2020-2/grupo07/blob/master/docs/FlujoCICD.png) y se utiliza commitlint y standard-version para semantic versioning
+El flujo se encuentra [aquí](docs/FlujoCICD.png) y se utiliza commitlint y standard-version para semantic versioning
 
 ##### RF2: logrado
 Se utiliza travis.
@@ -55,19 +45,21 @@ Se utiliza travis.
 Se implementan 3 tests, que se encuentran en `scripts/tests/`
 
 ##### RF4: logrado
-Para las variables de entorno en la EC2, estas se almacenan en un archivo .env que, a su vez, es guardado en una AMI.
+Para CD, las variables de entorno de las instancias se almacenan en un archivo .env que, a su vez, es guardado en una AMI.
 
-Para el caso de Travis, se guardan como variable de entorno en travis. Las variables sensibles se almacenan de modo que no se puede ver su valor.
+Para el caso de CI, se guardan como variable de entorno en travis. Las variables sensibles se almacenan de modo que no se puede ver su valor.
 
 #### Documentación
 
 ##### RF1: logrado
+Diagrama de componentes de la aplicación
 ![](docs/ComponentesAppE2.png)
 
 ##### RF2: logrado
 ![](docs/FlujoApp.png)
 
 ##### RF3: logrado
+El flujo de CI/CD desde el pull request hasta el deploy en EC2.
 ![](docs/FlujoCICD.png)
 
 ##### RF3: logrado
