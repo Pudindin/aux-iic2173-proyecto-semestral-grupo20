@@ -4,7 +4,6 @@ const bcrypt = require('bcrypt');
 const Hashids = require('hashids/cjs');
 const { OAuth2Client } = require('google-auth-library');
 
-
 const hashids = new Hashids(process.env.HASH_ID);
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -32,7 +31,7 @@ async function authenticateGoogleToken(req, res, next) {
     });
     const payload = ticket.getPayload();
     const { sub, email, name, picture } = payload;
-    req.userObject = { sub, email, fullName: name, photoUrl: picture }
+    req.userObject = { sub, email, fullName: name, photoUrl: picture };
   } catch (error) {
     return res.sendStatus(401);
   }
@@ -60,13 +59,14 @@ router.post('/signin', async (req, res) => {
     } else if (!user) {
       res.status = 404;
       throw new ValidationError('Unauthorized', ['No user with email']);
-    } else if (user && await user.checkPassword(password)) {
+    } else if (user && (await user.checkPassword(password))) {
       const token = await new Promise((resolve, reject) => {
         const userEmailHex = Buffer(user.email).toString('hex');
         jwtgenerator.sign(
           { userEmail: hashids.encodeHex(userEmailHex) },
-          process.env.JWT_SECRET, { expiresIn: '14d' },
-          (err, tokenResult) => (err ? reject(err) : resolve(tokenResult)),
+          process.env.JWT_SECRET,
+          { expiresIn: '14d' },
+          (err, tokenResult) => (err ? reject(err) : resolve(tokenResult))
         );
       });
       res.send({
@@ -75,6 +75,7 @@ router.post('/signin', async (req, res) => {
           attributes: {
             username: user.username,
             email: user.email,
+            admin: user.admin,
           },
         },
         meta: {
@@ -88,7 +89,10 @@ router.post('/signin', async (req, res) => {
       throw new ValidationError('Unauthorized', ['Wrong password or email']);
     }
   } catch (validationError) {
-    if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
       res.status = 400;
     }
     res.statusCode = res.status;
@@ -122,7 +126,10 @@ router.post('/signup', async (req, res) => {
   try {
     // Get the data
     const {
-      username, email, password, confirmPassword,
+      username,
+      email,
+      password,
+      confirmPassword,
     } = req.body.data.attributes;
     const checkUser = await orm.user.findOne({ where: { email } });
     if (req.body.data.type !== 'users') {
@@ -133,7 +140,9 @@ router.post('/signup', async (req, res) => {
       throw new ValidationError('Conflict', [`${email} is already registered`]);
     } else if (!validateEmail(email)) {
       res.status = 422;
-      throw new ValidationError('Unprocessable Entity', [`${email} is invalid`]);
+      throw new ValidationError('Unprocessable Entity', [
+        `${email} is invalid`,
+      ]);
     } else if (password === confirmPassword) {
       // Set user and we save it to the database
       let user = await orm.user.build(req.body.data.attributes);
@@ -145,9 +154,10 @@ router.post('/signup', async (req, res) => {
       const token = await new Promise((resolve, reject) => {
         const userEmailHex = Buffer(user.email).toString('hex');
         jwtgenerator.sign(
-          { userId: hashids.encodeHex(userEmailHex) },
-          process.env.JWT_SECRET, { expiresIn: '14d' },
-          (err, tokenResult) => (err ? reject(err) : resolve(tokenResult)),
+          { userEmail: hashids.encodeHex(userEmailHex) },
+          process.env.JWT_SECRET,
+          { expiresIn: '14d' },
+          (err, tokenResult) => (err ? reject(err) : resolve(tokenResult))
         );
       });
       res.statusCode = 201;
@@ -167,10 +177,13 @@ router.post('/signup', async (req, res) => {
       });
     } else {
       res.status = 401;
-      throw new ValidationError('Unauthorized', ['Passwords doesn\'t match']);
+      throw new ValidationError('Unauthorized', ["Passwords doesn't match"]);
     }
   } catch (validationError) {
-    if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
       res.status = 400;
       validationError.message = 'Bad Request';
       validationError.errors = ['Empty or invalid request data'];
@@ -191,10 +204,14 @@ router.post('/signup', async (req, res) => {
 
 router.get('/google-signin', authenticateGoogleToken, async (req, res) => {
   try {
-    const user = await orm.user.findOne({ where: { email: req.userObject.email } });
+    const user = await orm.user.findOne({
+      where: { email: req.userObject.email },
+    });
     if (!user) {
       res.status = 401;
-      throw new ValidationError('Unauthorized', [`No user with ${req.userObject.email}`]);
+      throw new ValidationError('Unauthorized', [
+        `No user with ${req.userObject.email}`,
+      ]);
     } else {
       res.send({
         data: {
@@ -203,7 +220,7 @@ router.get('/google-signin', authenticateGoogleToken, async (req, res) => {
             username: user.username,
             email: user.email,
           },
-        }
+        },
       });
     }
   } catch (validationError) {
@@ -243,7 +260,7 @@ router.post('/google-signup', async (req, res) => {
     });
     const payload = ticket.getPayload();
     const { sub, email } = payload;
-    const username = email.split("@")[0];
+    const username = email.split('@')[0];
     // Check data
     const checkUser = await orm.user.findOne({ where: { email } });
     if (req.body.data.type !== 'users') {
@@ -253,7 +270,7 @@ router.post('/google-signup', async (req, res) => {
       checkUser.google = true;
       await checkUser.save({ fields: ['google'] });
       // Send user back
-      res.status = 200
+      res.status = 200;
       res.send({
         data: {
           type: 'users',
@@ -261,17 +278,22 @@ router.post('/google-signup', async (req, res) => {
             username: checkUser.username,
             email: checkUser.email,
           },
-        }
+        },
       });
     } else {
       // Save user to database
-      let user = await orm.user.build({ username, email, password: sub, google: true });
+      let user = await orm.user.build({
+        username,
+        email,
+        password: sub,
+        google: true,
+      });
       await user.save({ fields: ['username', 'email', 'password', 'google'] });
       user = await orm.user.findOne({ where: { email } });
       user.username = `${username}#${user.id}`;
       await user.save({ fields: ['username'] });
       // Send user back
-      res.status = 201
+      res.status = 201;
       res.send({
         data: {
           type: 'users',
@@ -279,7 +301,7 @@ router.post('/google-signup', async (req, res) => {
             username: user.username,
             email: user.email,
           },
-        }
+        },
       });
     }
   } catch (error) {
@@ -295,6 +317,6 @@ router.post('/google-signup', async (req, res) => {
       ],
     });
   }
-})
+});
 
 module.exports = router;
