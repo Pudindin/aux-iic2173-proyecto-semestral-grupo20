@@ -36,7 +36,7 @@ Se implementa OAuth mediante la API de GoogleAuth
 #### CI/CD
 
 ##### RF1: logrado
-El flujo se encuentra [aquí](docs/FlujoCICD.png) y se utiliza commitlint y standard-version para semantic versioning. Para un nuevo release, basta correr yarn run standard-version y luego git push --set-tags.
+El flujo se encuentra [aquí](docs/FlujoCICD.png) y se utiliza commitlint y standard-version para semantic versioning. Para un nuevo release, basta correr yarn run standard-version y luego git push --set-tags. Commitlint fuerza a hacer commits con mensajes descriptivos sobre el tipo de cambio (feat, fix, BREAKING CHANGE) de modo que calcular la nueva versión fácilmente.
 
 ##### RF2: logrado
 Se utiliza travis.
@@ -83,4 +83,6 @@ La documentación de la API se realizó mediante POSTMAN y se encuentra en [este
 ##### RF2: logrado
 
 ##### RF3: logrado
-Las documentación se encuentra en el word.
+Para la implementación de CSS Injection se optó por realizar una tabla en la base de datos, la cual contiene una columna que está relacionada con alguna sala en específico, otra columna que contiene el código CSS en sí, otra columna booleana que muestra si está aprobada o no, y finalmente una columna booleana que dice si fue probada o no.
+
+Para aplicar dicho CSS en el frontend, si está aplicada, esta es solo aplicada en la sala, donde en el primer request se pide el CSS específico para cada sala.
