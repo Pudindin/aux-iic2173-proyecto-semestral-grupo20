@@ -154,7 +154,7 @@ router.post('/signup', async (req, res) => {
       const token = await new Promise((resolve, reject) => {
         const userEmailHex = Buffer(user.email).toString('hex');
         jwtgenerator.sign(
-          { userId: hashids.encodeHex(userEmailHex) },
+          { userEmail: hashids.encodeHex(userEmailHex) },
           process.env.JWT_SECRET,
           { expiresIn: '14d' },
           (err, tokenResult) => (err ? reject(err) : resolve(tokenResult))
