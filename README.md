@@ -3,7 +3,7 @@
 ![](https://travis-ci.org/Pudindin/aux-iic2173-proyecto-semestral-grupo20.svg?branch=master)
 
 ## Consideraciones generales
-Documentación...
+La documentación se encuentra aquí...
 
 La api se puede encontrar en [open-chat-api.tk](https://open-chat-api.tk).
 
@@ -55,18 +55,23 @@ Se utiliza travis.
 Se implementan 3 tests, que se encuentran en `scripts/tests/`
 
 ##### RF4: logrado
-Para las variables de entorno en la EC2, estas se almacenan en un archivo .env almacenado en una AMI.
+Para las variables de entorno en la EC2, estas se almacenan en un archivo .env que, a su vez, es guardado en una AMI.
+
+Para el caso de Travis, se guardan como variable de entorno en travis. Las variables sensibles se almacenan de modo que no se puede ver su valor.
 
 #### Documentación
 
 ##### RF1: logrado
-Se encuentra [aquí](https://github.com/IIC3745-2020-2/grupo07/blob/master/docs/ComponentesAppE2.png)
+Se encuentra [aquí](docs/ComponentesAppE2.png)
 
 ##### RF2: logrado
-Se encuentra [aquí](https://github.com/IIC3745-2020-2/grupo07/blob/master/docs/FlujoApp.png)
+Se encuentra [aquí](docs/FlujoApp.png)
 
 ##### RF3: logrado
-Se encuentra [aquí](https://github.com/IIC3745-2020-2/grupo07/blob/master/docs/FlujoCICD.png)
+Se encuentra [aquí](docs/FlujoCICD.png)
+
+##### RF3: logrado
+Se documentó en un archivo word siguiendo el estándar de Postman; se encuentra aquí...
 
 
 ### Sección variable
@@ -79,7 +84,6 @@ Se encuentra [aquí](https://github.com/IIC3745-2020-2/grupo07/blob/master/docs/
 
 ##### RF3: logrado
 
-
 #### CSS/JS injection
 
 ##### RF1: logrado
@@ -87,3 +91,4 @@ Se encuentra [aquí](https://github.com/IIC3745-2020-2/grupo07/blob/master/docs/
 ##### RF2: logrado
 
 ##### RF3: logrado
+Las documentación se encuentra aquí...
