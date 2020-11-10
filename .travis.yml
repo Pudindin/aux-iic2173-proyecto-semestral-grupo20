@@ -1,0 +1,66 @@
+language: node_js
+
+branches:
+  only:
+  - master
+
+services:
+  - docker
+  - postgresql
+
+before_install:
+  - cd web_app
+  - touch pg-init-scripts/data-base.env
+  - touch .env
+
+install:
+  - docker-compose build
+
+script:
+  - bash pg-init-scripts/create-multiple-database.sh
+  - echo "pronto, los tests"
+  - docker-compose -f docker-compose.travis.yml up -d
+  - bash scripts/tests/test1.sh
+  - bash scripts/tests/test2.sh
+  - bash scripts/tests/test3.sh
+  - rm docker-compose.yml
+  - cp docker-compose.production.yml docker-compose.yml
+  - zip -r latest *
+  - mkdir -p dpl_cd_upload
+  - mv latest.zip dpl_cd_upload
+
+after_success:
+  - docker --version
+  - git --version
+  - pip install --user awscli # install aws cli w/o sudo
+  - aws --version
+  - export PATH=$PATH:$HOME/.local/bin # put aws in the path
+  - eval $(aws ecr get-login --region us-east-2 --no-include-email) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - docker build -t ass_g20 .
+  - docker tag ass_g20:latest 161618437221.dkr.ecr.us-east-2.amazonaws.com/ass_g20:latest
+  - docker push 161618437221.dkr.ecr.us-east-2.amazonaws.com/ass_g20:latest
+  - docker images
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    local_dir: dpl_cd_upload
+    bucket: "openchat-deploy-from-travis"
+    region: us-east-2
+    upload_dir: latest
+    skip_cleanup: true
+    on:
+      branch: master
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    region: us-east-2
+    key: latest/latest.zip
+    bucket: "openchat-deploy-from-travis"
+    bundle_type: zip
+    application: openchat
+    deployment_group: openchat-deploy
+    wait_until_deployed: true
+    on:
+      branch: master

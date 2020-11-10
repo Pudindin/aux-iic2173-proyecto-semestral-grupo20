@@ -3,6 +3,7 @@ const jwtgenerator = require('jsonwebtoken');
 const Hashids = require('hashids/cjs');
 const jsonApiSerializer = require('jsonapi-serializer');
 const { ValidationError } = require('sequelize');
+const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 const orm = require('../../models');
 
@@ -43,19 +44,47 @@ async function sendEmail(data) {
 //sendEmail(params);
 
 
-const hashids = new Hashids(process.env.HASH_ID, 10);
+const hashids = new Hashids(process.env.HASH_ID);
 const router = express.Router({ mergeParams: true });
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   if (token == null) return res.sendStatus(401);
+  let JWT_result = true;
+  let Google_result = true;
 
   jwtgenerator.verify(token, process.env.JWT_SECRET, (err, data) => {
-    if (err) return res.sendStatus(403);
-    req.userId = hashids.decode(data.userId);
-    next();
+    if (err) {
+      JWT_result = false;
+    } else {
+      JWT_result = Buffer(hashids.decodeHex(data.userEmail), 'hex').toString('utf8');
+    }
   });
+
+  // GoogleVerification
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { email } = payload;
+    Google_result = email;
+  } catch (error) {
+    Google_result = false;
+  }
+  if (!JWT_result && !Google_result) {
+    console.log('declinados');
+    return res.sendStatus(401);
+  } else if (JWT_result) {
+    req.userEmail = JWT_result;
+    next();
+  } else {
+    req.userEmail = Google_result;
+    next();
+  }
 }
 
 function jsonSerializer(type, options) {
@@ -68,7 +97,6 @@ function checkMention(message) {
 }
 
 router.get('/', authenticateToken, async (req, res) => {
-  const user = await orm.user.findByPk(req.userId[0]);
   try {
     let roomId;
     if (req.query.roomId) {
@@ -119,6 +147,59 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/fast', authenticateToken, async (req, res) => {
+  try {
+    let roomId;
+    if (req.query.roomId) {
+      roomId = req.query.roomId;
+    } else if (req.params.roomId) {
+      roomId = req.params.roomId;
+    }
+    if (!roomId) {
+      res.status = 422;
+      throw new ValidationError('Unprocessable Entity', ['No room provided']);
+    }
+    let messagesList = [];
+    await new Promise((resolve, reject) => {
+      redisClient.get(`${roomId}`, (err, reply) => {
+        messagesList = JSON.parse(reply);
+        resolve();
+      });
+    });
+    if (!messagesList) {
+      messagesList = [];
+    }
+    const responseBody = jsonSerializer('message', {
+      attributes: ['message', 'createdAt', 'user'],
+      user: {
+        ref: 'id',
+        attributes: ['username'],
+      },
+      topLevelLinks: {
+        self: '/api/messages',
+      },
+    }).serialize(messagesList);
+    res.send(responseBody);
+  } catch (validationError) {
+    if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
+      res.status = 400;
+      validationError.message = 'Bad Request';
+      validationError.errors = ['Empty or invalid request data'];
+    }
+    res.statusCode = res.status;
+    res.send({
+      errors: [
+        {
+          status: res.status,
+          source: '/api/messages/',
+          message: validationError.message,
+          error: validationError.errors,
+        },
+      ],
+    });
+  }
+});
+
 /*
 {
   "data": {
@@ -131,7 +212,7 @@ router.get('/', authenticateToken, async (req, res) => {
 }
 */
 router.post('/', authenticateToken, async (req, res) => {
-  const user = await orm.user.findByPk(req.userId[0]);
+  const user = await orm.user.findOne({ where: { email: req.userEmail } });
   try {
     let checkRoom = await orm.room.findByPk(req.body.data.attributes.roomId);
     if (req.params.roomId) {
@@ -156,7 +237,21 @@ router.post('/', authenticateToken, async (req, res) => {
       }
       const message = await orm.message.build(req.body.data.attributes);
       message.userId = user.id;
+      message.roomId = checkRoom.id;
       await message.save({ fields: ['message', 'roomId', 'userId'] });
+      // save on redis
+      const messagesList = await orm.message.findAll(
+        {
+          limit: 10,
+          where: { roomId: checkRoom.id },
+          include: {
+            model: orm.user,
+            attributes: ['id', 'username', 'email'],
+          },
+          order: [[ 'createdAt', 'DESC' ]],
+        },
+      );
+      redisClient.set(`${checkRoom.id}`, JSON.stringify(messagesList));
       // Send the response
       message.user = user;
       res.statusCode = 201;

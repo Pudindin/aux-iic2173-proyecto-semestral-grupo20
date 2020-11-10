@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const request = require('request');
 const routes = require('./routes');
+require('dotenv').config();
 
 // Constructor
 const app = express();
@@ -35,9 +36,9 @@ app.use('', routes);
 
 // Setting redis
 var redis = require('redis');
-redisClient = redis.createClient('6379', '34.224.111.177');
+redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_IP);
 redisClient.on('connect', function() {
-  console.log('Redis connected !!!');
+console.log('Redis connected !!!');
 })
 redisClient.set('test1', 'value', function(err, reply) {
 });

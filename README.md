@@ -1,117 +1,129 @@
 # IIC2173 - Entrega 1 - Levantando clusters hechos por estudiantes de arquitectura de sistemas de software
 
-Esta segunda parte del proyecto sirve para que conozcan e implementen herramientas para tener escalabilidad y performance en sus aplicaciones. Para esto, cada grupo debe escoger una E0 de los integrantes de su grupo y trabajar desde ahí o implementar una nueva que cumpla con los requisitos de la E0 (poco recomendado). Eventualmente pueden complementar su solución entre los conocimientos aprendidos por todos los integrantes durante esa primera entrega. 
+## Consideraciones generales
+La documentación se encuentra al final de este README y en el archivo `Documentación E1 grupo 20.pdf`, en el directorio raíz del repo, y [aquí](https://github.com/iic2173/iic2173-proyecto-semestral-grupo20/blob/master/Documentaci%C3%B3n%20E1%20grupo%2020.pdf).
 
-## Objetivo
+La api se puede encontrar en [open-chat-api.tk](https://open-chat-api.tk).
 
-La entrega tiene por objetivo separar el frontend del backend del chat. Para esto se implementará una *Content Delivery Network* (CDN) y se desacomplarán los servicios utilizando endpoints mediante HTTP.
+El frontend se puede encontrar en [open-chat.ml](https://open-chat.ml).
 
-## Fecha límite
+## Método de acceso
+El método de acceso elegido fue mediante ssh utilizando una clave, en específico, el archivo ```allsshinstance.pem``` para las instancias de backend y base de datos.
 
-Debe ser entregada a más tardar a las 23:59 del domingo 11 de Octubre. Las condiciones de entrega están explicadas más abajo. De ser entregada el día lunes 12 de Octubre se obtendrá nota máxima 6.0.
+Para acceder al backend con ssh:
 
-### Método de entrega
+`ssh -i "allsshinstance.pem" root@ec2-13-58-214-7.us-east-2.compute.amazonaws.com`.
 
-Para esta entrega, deberan hacer una *demo* de 10-15 minutos acerca de lo que hicieron en la entrega y que al menos un tercio del grupo exponga sobre la solución. Se les pedirá mostrar su trabajo en la consola del servicio cloud y pruebas de usabilidad. Se les avisarán las fechas disponibles (es la semana entre entregas) y algunas pruebas obligatorias que deben hacer para evaluar la correctitud de su solución.
+Para acceder a la BD con ssh:
 
-Deben subir el código de su solución (hasta donde aplique) en el repositorio que se les asignará vía github classroom a cada grupo. Deben inscribirse en el siguiente link
+`ssh -i "allsshinstance.pem" ubuntu@ec2-18-223-238-42.us-east-2.compute.amazonaws.com`
 
-https://classroom.github.com/g/9f2h5kYm
-
-Primero entra un miembro a crear el grupo y luego los demás pueden entrar a ese grupo. **Ojo con que entren al grupo correcto, puesto que es difícil cambiarlos.** 
-Si se crean dos grupos con el mismo nombre, habra una penalizacion al grupo que se creo después.
-También deben entregar el archivo .pem asociado al servidor EC2 para revisarla. Alternativamente pueden indicarnos para su disponibilidad para incorporarnos (ayudantes) a su lista de "_authorized_keys_". 
-
-Además, para poder facilitar la corrección deben realizar un README.md que señale:
-
-- Consideraciones generales
-- Método de acceso al servidor con archivo .pem y _ssh_ (no publicar estas credenciales en el repositorio). 
-- Logrado o no logrado y comentarios si son necesarios para cada aspecto a evaluar en la Parte mínima y en la Parte variable.
-- De realizar un tercer requisito variable también explicitar en el readme.
-
-Pueden sobreescribir este README sin problemas o cambiarle el nombre.
 
 ## Requisitos
-Esta entrega consiste en dos partes, la parte mínima (que todos deben lograr) que vale **50%** de la nota final y una parte variable que también vale **50%**. Sobre la parte variable, tendrán 3 opciones para trabajar, de las que deberán escoger 2. Cada una de las que escojan para evaluar vale **25%** de la nota final, y realizar una tercera parte puede dar hasta 3 décimas.
 
----
+### Parte mínima
 
-## Parte mínima
+#### Backend
 
-### Sección mínima (50%) (30p)
+##### RF1: logrado
+El chat básico funciona, se envían mensajes y se registra el timestamp.
 
-#### **Backend**
-* **RF1: (3p)** Se debe poder enviar mensajes y se debe registrar su timestamp. Estos mensajes deben aparecer en otro usuario, ya sea en tiempo real o refrescando la página. **El no cumplir este requisito completamente limita la nota a 3.9**
-* **RF2: (5p)** Se deben exponer endpoints HTTP que realicen el procesamiento y cómputo del chat para permitir desacoplar la aplicación. **El no cumplir este requisito completamente limita la nota a 3.9**
+##### RF2: logrado
+El backend funciona como API con endpoints http.
 
-* **RF3: (7p)** Establecer un AutoScalingGroup con una AMI de su instancia EC2 para lograr autoescalado direccionado desde un ELB (_Elastic Load Balancer_).
-    * **(4p)** Debe estar implementado el Load Balancer
-    * **(3p)** Se debe añadir al header del request información sobre cuál instancia fue utilizada para manejar el request. Se debe señalar en el Readme cuál fue el header agregado.
-* **RF4: (2p)** El servidor debe tener un nombre de dominio de primer nivel (tech, me, tk, ml, ga, com, cl, etc).
+##### RF3: parcial
+Se implementó el AutoScalingGroup con un LoadBalancer, pero aunque se añadió el header, no se logró que este funcionara.
 
-* **RF4: (3p)** El dominio debe estar asegurado por SSL con Let's Encrypt. No se pide *auto renew*. Tambien pueden usar el servicio de certificados de AWS para el ELB
-    * **(2p)** Debe tener SSL. 
-    * **(1p)** Debe redirigir HTTP a HTTPS.
+##### RF4: logrado
+El servidor se encuentra en open-chat-api.tk
 
-#### **Frontend**
-* **RF5: (3p)** Utilizar un CDN para exponer los *assets* de su frontend. (ej. archivos estáticos, el mismo *frontend*, etc.). Para esto recomendamos fuertemente usar cloudfront en combinacion con S3.
-* **RF6: (7p)** Realizar una aplicación para el *frontend* que permita ejecutar llamados a los endpoints HTTP del *backend*.
-    * **(3p)** Debe hacer llamados al servidor correctamente.
-    * Elegir **$1$** de los siguientes. No debe ser una aplicación compleja en diseño. No pueden usar una aplicacion que haga rendering via template de los sitios web. Debe ser una app que funcione via endpoints REST
-        * **(4p)** Hacer una aplicación móvil (ej. Flutter, ReactNative)
-        * **(4p)** Hacer una aplicación web (ej. ReactJS, Vue, Svelte)
+##### RF4 (https): logrado
+El dominio esta asegurado por SSL utilizando la certificación de AWS, y se redirige de http a https.
 
----
+#### Frontend
 
-## Sección variable
+##### RF5: logrado
+Se utilizo CDN para exponer todo el frontend, por lo que no es necesario correr una instancia aparte. Para lograrlo se implementó CloudFront con S3.
 
-Deben completar al menos 2 de los 3 requisitos
-
-### Caché (25%) (15p)
-Para esta sección variable la idea es implementar una capa de Caché para almacenar información y reducir la carga en el sistema. Para almacenar información para la aplicación recomendamos el uso de **Redis**, así como recomendamos Memcached para fragmentos de HTML o respuestas de cara al cliente. 
-
-* **RF1: (4p)** Levantar la infraestructura necesaria de caché. Se puede montar en otra máquina o usando el servicios administrado por AWS. Se debe indicar como funciona en local y en producción. 
-* **RF2: (6p)** Utilizar la herramienta seleccionada de caché para almacenar las información para al menos 2 casos de uso. Por ejemplo las salas y sus últimos mensajes o credenciales de acceso (login). 
-    * **Restricción** Por cada caso de uso debe utilizar alguna configuración distinta (reglas de entrada FIFO/LIFO, estructura de datos o bien el uso de reglas de expiración)
-* **RF3: (5p)** Documentar y explicar la selección de la tecnología y su implementación en el sistema. Responder a preguntas como: "¿por qué se usó el FIFO/LRU o almacenar un hash/list/array?" para cada caso de uso implementado. 
+##### RF6: logrado
+El frontend se implementó utilizando una aplicación full React (React + React Router + Axios), que hace llamadas a los endpoints HTTP expuestos en el backend. Esta aplicación se encuentra en open-chat.ml  
 
 
-### Trabajo delegado (25%) (15p)
-Para esta sección de delegación de trabajo recomendamos el uso de "Functions as a Service" como el servicio administrado de AWS, _Lambda Functions_, o bien el uso de más herramientas como AWS SQS y AWS SNS. 
+### Sección variable
 
-Se pide implementar al menos **3 casos de uso con distinto tipo de integración**.
+#### Caché
 
+##### RF1: logrado
+Se implementó una instancia AWS EC2 con redis-server, a la cual se conecta el backend. Se utiliza esta instancia tanto en desarrollo como en producción.
 
-1.- Mediante una llamada web (AWS API Gateway)
-2.- Mediante código incluyendo la librería (sdk)
-3.- Como evento a partir de una regla del AutoScalingGroup
-4.- Mediante Eventbridge para eventos externos (NewRelic, Auth0 u otro)
-5.- Cuando se esté haciendo un despliegue mediante CodeCommit 
-6.- Cuando se cree/modifique un documento a S3
+##### RF2: logrado
+- Un caso de uso fue almacenar los últimos 10 mensajes de la sala, entregarlos rápidamente en el frontend, y luego hacer el resto del request. Para esta metodología se implementó FIFO.
+- El otro caso de uso fue guardar en cache y enviar las salas actuales, con un periodo de expiración para este caché.
 
-Alternativamente pueden integrar más servicios para realizar tareas más lentas de la siguiente forma: 
-1.- Al crear un mensaje se registra en una cola (SQS) que llama a una función en lambda (directamente o a través de SNS)
-2.- En Lambda se analiza ciertos criterios (si es positivo o negativo, si tiene "garabatos" o palabras prohibidas en el chat) y con este resultado se "taggea" el comentario. 
-Si se crean en "tópics" distintos se consideran como 2 casos de uso (por el uso de distintas herramientas). 
+##### RF3: logrado
+La documentación se encuentra al final de este archivo.
 
-Seguir el siguiente tutorial cuenta como 3 (https://read.acloud.guru/perform-sentiment-analysis-with-amazon-comprehend-triggered-by-aws-lambda-7363db23651f o https://medium.com/@manojf/sentiment-analysis-with-aws-comprehend-ai-ml-series-454c80a6114). No es necesaro que entiendan a cabalidad como funciona el código de estas funciones, pero sí que comprendan el flujo de la información y cómo es que se ejecuta.
+#### Mensajes en tiempo real
 
-Se deben documentar las decisiones tomadas. 
+##### RF1: logrado
+Se implementó con websockets (socket.IO)
 
-* **RF: (5p)** Por cada uno de los 3 tipos de integración.
-    * **(3p)** Por la implementación.
-    * **(2p)** Por la documentación.
+##### RF2: logrado
+Se envía un mail mediante AWS SES.
 
-### Mensajes en tiempo real (25%) (15p)
-El objetivo de esta sección es implementar la capacidad de enviar actualizaciones hacia otros servicios. Servicios recomendados a utilizar: SNS, Sockets (front), AWS Pinpoint entre otras. 
-
-* **RF1: (5p)** Cuando se escriben mensajes en un chat/sala que el usuario está viendo, se debe reflejar dicha acción sin que éste deba refrescar su aplicación. 
-* **RF2: (5p)** Independientemente si el usuario está conectado o no, si es nombrado con @ o # se le debe enviar una notificación (al menos crear un servicio que diga que lo hace, servicio que imprime "se está enviando un correo")
-* **RF3: (5p)** Debe documentar los mecanismos utilizados para cada uno de los puntos anteriores indicando sus limitaciones/restricciones. 
+##### RF3: logrado
+La documentación se encuentra al final de este archivo.
 
 
-#### Caso borde
-Si su grupo implementó varias funcionalidades como comandos en los chats, es posible utilizar dichas funciones en Lambdas y manejarlas en paralelo utilizando SQS y SNS en conjunto. Pueden aprovechar su desarrollo para implementar las secciones variables 2 y 3 en conjunto.
+## Documentación
+
+### Backend
+Para el Backend se utilizo expressJS + socket.IO, y para la autenticación se implmento JWT. Es full REST api siguiendo la especificación [JSON:API](https://jsonapi.org/) para las respuestas entregadas, y utilizando React para consumir dicha Api.
+Sus endpoints son:
+- https://open-chat-api.tk/api/auth/signin => método POST para iniciar sesión
+- https://open-chat-api.tk/api/auth/signup => método POST para registrarse sesión
+- https://open-chat-api.tk/api/rooms/ => método GET que retorna las salas solo si se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/ => método POST que crea una sala solo si no existe y se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:id => método GET que retorna detalle de la sala con id ":id", solo si se otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages => método GET que retorna los mensajes de la sala "roomId", y solo si se le otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages/fast => método GET que retorna los ultimos 10 mensajes de la sala "roomId" buscandolo en cache, y solo si se le otorga un JWT.
+- https://open-chat-api.tk/api/rooms/:roomId/messages => método POST que crea un mensaje en la sala "roomId", y solo si se le otorga un JWT.
 
 
----
+### Frontend
+Se implementó a través de AWS Cloudfront y AWS S3. Toda la página se encuentra en un bucket y es servida a través de un CDN en su totalidad
+
+### CDN
+El CDN se implementó con AWS Cloudfront y AWS S3, y actualmente todo el frontend se encuentra hosteado ahí, en un bucket llamado openchat. Desde ahí se consume el frontend, y los assets de este se consumen desde otro CDN, también con AWS Cloudfront y AWS S3, en un bucket llamado e1g20 donde se encuentran las imágenes, como el favicon y el logo, y también el archivo css.
+
+### Backend y Load Balancer
+El backend se implementó dentro de una instancia de AWS EC2 con docker-compose, desde la cual se conecta a Redis y a la BD. Para iniciar docker-compose se creo un servicio aplicado al sistema init de la instancia.
+
+Además, un load balancer se encarga de replicar la instancia en caso de que el uso de la CPU supere el 50% y, posteriormente, elige a qué instancia dirigir una llamada a la api.
+
+### BD
+La base de datos se encuentra corriendo dentro de una instancia de EC2 separada del backend. De este modo, al escalar este último, la BD se mantiene única y los datos se mantienen consistentes entre instancias.
+
+### Mensajes en tiempo real
+Se utilizaron websockets (socket.IO), de modo que los usuarios, al entrar a un chatroom, se conectan a un canal y, cuando se envía un mensaje por dicho chat, el backend notifica a todos los usuarios conectados a él.
+
+Una restricción que posee es que puede mantener, a lo más, alrededor de 600 conexiones estables simultáneas. Pero, dado el tamaño actual de la aplicación, esto no es problema.
+
+### Notificaciones por mail
+Se utilizó el servicio de AWS de Simple Email Sending (SES). Este almacena un template del correo, y desde el backend se conecta al servicio para enviar un mail según ese template. Se utilizó dado que es sencillo de implementar y ya que la aplicación completa se encuentra en AWS.
+
+Una de las restricciones que tiene es el límite de 200 mails por día pero, dado el tamaño de la aplicación, es una cota superior lejana. También restringe la tasa de envío de mails a 1 por 1 segundo, aunque permite superarla por periodos cortos de tiempo (no más de 4 segundos). Pero dado el tamaño actual de la aplicación, es un límite razonable.
+
+Otra restricción es que, en un principio, sólo permite enviar correos a cuentas validadas por AWS; y para cambiar este comportamiento se debe realizar una solicitud a través de la página. Esto, más que nada, impone la restricción de tiempo de esperar a que la solicitud sea resuelta.
+
+
+### Cache
+Para la implementación de la capa de caché utilizamos Redis para almacenar información de la aplicación.
+La infraestructura consiste en una instancia AWS EC2 con redis-server corriendo. Redis fue instalado y configurado manualmente. Tanto en local como en producción nuestro backend se conecta directamente a esta instancia que está siempre activa y recibiendo consultas.
+
+Esta instancia fue montada en la cuenta de AWS Educate personal (raespinoza4@uc.cl) para que en el caso de que existiera un error en la configuración no se comiera los créditos del grupo.
+
+Casos de uso:
+- Salas: Cada vez que un usuario consulta por las salas del chat el backend primero revisa si están en caché, de no ser así realiza la consulta a la BD, le entrega el resultado al cliente y luego guarda en cache el resultado de la query. Las salas se guardan en forma de string (desde un json) y utilizamos una regla de expiración de 10 segundos. Elegimos esta regla de expiración para poder probar la aplicación y verificar que realmente se están obteniendo las rooms desde redis, luego de este tiempo se pudieron haber creado nuevas salas y es necesario ir a buscar la información a la base de datos nuevamente.
+
+- Mensajes: Se almacenan en caché los últimos 10 mensajes de cada sala de chat. Como método de reemplazo se eligió FIFO, de modo que, si se llena la caché y se quiere almacenar un nuevo valor, se sobreescribe el del más antiguo. Para este caso es bastante útil si queremos mostrar un set de últimos mensajes a los usuarios siempre que llegue uno nuevo el que salga de caché sea el primero que se envió dejando espacio al mensaje nuevo, lo que confirma nuestra selección de FIFO.

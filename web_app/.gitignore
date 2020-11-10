@@ -1,3 +1,4 @@
 .env
 node_modules/
 pg-init-scripts/data-base.env
+pg-init-scripts/database.env

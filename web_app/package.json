@@ -1,6 +1,6 @@
 {
   "name": "Entrega0",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "main": "index.js",
   "author": "Diego Vásquez",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
+    "google-auth-library": "^6.1.3",
     "hashids": "^2.2.1",
     "jsonapi-serializer": "^3.6.6",
     "jsonwebtoken": "^8.5.1",
@@ -22,15 +23,31 @@
     "pg-hstore": "^2.3.3",
     "redis": "^3.0.2",
     "request": "^2.88.2",
+    "semantic-versioning": "^1.0.2",
     "sequelize": "^6.3.4",
     "sequelize-cli": "^6.2.0",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "socket.io-redis": "^5.4.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
-    "nodemon": "^2.0.4"
+    "husky": "^4.3.0",
+    "nodemon": "^2.0.4",
+    "standard-version": "^9.0.0"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E  HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }
