@@ -11,7 +11,8 @@ module.exports = {
     rules = JSON.stringify(rules);
     const css_injection_new = [
       {
-        css: rules,
+        type: 'css',
+        code: rules,
         roomId: 1,
         approved: false,
         checked: false,

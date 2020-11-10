@@ -8,9 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      css: {
+      type: {
         allowNull: false,
         type: Sequelize.STRING,
+      },
+      code: {
+        allowNull: false,
+        type: Sequelize.TEXT,
       },
       roomId: {
         type: Sequelize.INTEGER,

@@ -9,9 +9,8 @@ function jsonSerializer(type, options) {
 }
 
 router.post('/', async (req, res) => {
-  const { name, css } = req.body.data.attributes;
+  const { name, type, code} = req.body.data.attributes;
   console.log(res.status);
-  console.log(name, css);
   const checkRoom = await orm.room.findOne({ where: { name }, raw: true });
   console.log(`Room :${checkRoom.id}`);
   let roomId = checkRoom.id;
@@ -19,7 +18,6 @@ router.post('/', async (req, res) => {
   try {
     const { name, css } = req.body.data.attributes;
     console.log(res.status);
-    console.log(name, css);
     const checkRoom = await orm.room.findOne({ where: { name }, raw: true });
     console.log(`Room :${checkRoom.id}`);
     let roomId = checkRoom.id;
@@ -35,17 +33,18 @@ router.post('/', async (req, res) => {
       res.status = 409;
       throw new ValidationError('Conflict', [`room with ${name} doesn't exists`]);
     } else {
-      const css_new = await orm.css_injection_new.build({ roomId, css, approved, checked});
-      await css_new.save({ fields: ['roomId', 'css', 'approved', 'checked'] });
+      const css_new = await orm.css_injection_new.build({ roomId, type, code, approved, checked});
+      await css_new.save({ fields: ['roomId', 'type', 'code', 'approved', 'checked'] });
       // Send the response
       res.statusCode = 201;
       res.send({
         data: {
-          type: 'csses',
+          type: 'injection',
           id: css_new.id,
           attributes: {
             roomId: roomId,
-            css: css_new.css,
+            type: css_new.type,
+            code: css_new.code,
             approved: approved,
             checked: checked,
           },
@@ -74,11 +73,11 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
 
-  cssList = await orm.css_injection_new.findAll();
-  console.log(cssList);
+  injectionList = await orm.css_injection_new.findAll();
+  console.log(injectionList);
   const responseBody = jsonSerializer('css', {
-    attributes: ['roomId', 'css', 'approved', 'checked'],
-  }).serialize(cssList);
+    attributes: ['roomId', 'type', 'code', 'approved', 'checked'],
+  }).serialize(injectionList);
 
   res.send(responseBody);
 });
@@ -86,13 +85,13 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const css_injection_new = await orm.css_injection_new.findByPk(id);
-    if (!css_injection_new) {
+    const css_js_injection = await orm.css_js_injection.findByPk(id);
+    if (!css_js_injection) {
       throw new ValidationError();
     }
-    const responseBody = jsonSerializer('css_injection_new', {
-      attributes: ['roomId', 'css', 'approved', 'checked'],
-    }).serialize(css_injection_new);
+    const responseBody = jsonSerializer('css_js_injection', {
+      attributes: ['roomId', 'type', 'code', 'approved', 'checked'],
+    }).serialize(css_js_injection);
     res.send(responseBody);
   } catch (validationError) {
     res.statusCode = 404;
@@ -100,7 +99,7 @@ router.get('/:id', async (req, res) => {
       errors: [
         {
           status: res.status,
-          source: `/css_injection_new/${req.params.id}`,
+          source: `/css_js_injection/${req.params.id}`,
           message: `Css injection with id ${req.params.id} is not registered in the database`,
           error: 'Css injection doesn\'t exists',
         },
