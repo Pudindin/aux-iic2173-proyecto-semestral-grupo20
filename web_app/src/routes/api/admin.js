@@ -12,6 +12,44 @@ const hashids = new Hashids(process.env.HASH_ID, 10);
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const router = express.Router();
 
+// AWS configuration
+const aws = require('aws-sdk');
+const ses = new aws.SES({
+  accessKeyId: process.env.AWS_ACCES_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: 'us-east-2',
+});
+
+async function sendEmail(data) {
+  const { reciever_name, reciever_email, user_name, room_name } = data;
+  const templateData = {
+    reciever_name: reciever_name,
+    user_name: user_name,
+    room_name: room_name,
+  };
+  const template_params = {
+    Source: 'chatapp.ass.grupo20@gmail.com',
+    Destination: {
+      ToAddresses: [reciever_email],
+    },
+    Template: 'UserMention',
+    TemplateData: JSON.stringify(templateData),
+  };
+  // Send email
+  const response = await ses.sendTemplatedEmail(template_params).promise();
+  return response;
+}
+
+function validateEmail(email) {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+function checkMention(message) {
+  const re = /^@.*#[0-9]*/g;
+  return re.test(message);
+}
+
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -52,30 +90,84 @@ async function authenticateToken(req, res, next) {
   }
 }
 
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) return res.sendStatus(401);
-
-  jwtgenerator.verify(token, process.env.JWT_SECRET, (err, data) => {
-    if (err) return res.sendStatus(403);
-    req.userId = hashids.decode(data.userId);
-    next();
-  });
-}
-
 function jsonSerializer(type, options) {
   return new jsonApiSerializer.Serializer(type, options);
 }
 
 router.get('/users', authenticateToken, async (req, res) => {
-  const user = await orm.user.findByPk(req.userId[0]);
   const userList = await orm.user.findAll();
   const responseBody = jsonSerializer('user', {
     attributes: ['username', 'password', 'email', 'id'],
   }).serialize(userList);
 
   res.send(responseBody);
+});
+
+router.post('/users', async (req, res) => {
+  try {
+    // Get the data
+    const {
+      username,
+      email,
+      password,
+      confirmPassword,
+    } = req.body.data.attributes;
+    const checkUser = await orm.user.findOne({ where: { email } });
+    if (req.body.data.type !== 'users') {
+      res.status = 406;
+      throw new ValidationError('Not Acceptable', ['Invalid type of request']);
+    } else if (checkUser) {
+      res.status = 409;
+      throw new ValidationError('Conflict', [`${email} is already registered`]);
+    } else if (!validateEmail(email)) {
+      res.status = 422;
+      throw new ValidationError('Unprocessable Entity', [
+        `${email} is invalid`,
+      ]);
+    } else if (password === confirmPassword) {
+      // Set user and we save it to the database
+      let user = await orm.user.build(req.body.data.attributes);
+      await user.save({ fields: ['username', 'email', 'password', 'google'] });
+      user = await orm.user.findOne({ where: { email } });
+      user.username = `${username}#${user.id}`;
+      await user.save({ fields: ['username'] });
+      // We create the cookie containing the access token
+      res.statusCode = 201;
+      res.send({
+        data: {
+          type: 'users',
+          attributes: {
+            username: user.username,
+            email: user.email,
+            id: user.id,
+          },
+        },
+      });
+    } else {
+      res.status = 401;
+      throw new ValidationError('Unauthorized', ["Passwords doesn't match"]);
+    }
+  } catch (validationError) {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
+      res.status = 400;
+      validationError.message = 'Bad Request';
+      validationError.errors = ['Empty or invalid request data'];
+    }
+    res.statusCode = res.status;
+    res.send({
+      errors: [
+        {
+          status: res.status,
+          source: '/api/admin/users',
+          message: validationError.message,
+          error: validationError.errors,
+        },
+      ],
+    });
+  }
 });
 
 router.get('/users/:id', authenticateToken, async (req, res) => {
@@ -189,6 +281,60 @@ router.get('/rooms', authenticateToken, async (req, res) => {
   }).serialize(roomsList);
 
   res.send(responseBody);
+});
+
+router.post('/rooms', authenticateToken, async (req, res) => {
+  try {
+    const { name } = req.body.data.attributes;
+    const checkRoom = await orm.room.findOne({ where: { name } });
+    if (req.body.data.type !== 'rooms') {
+      res.status = 406;
+      throw new ValidationError('Not Acceptable', ['Invalid type of request']);
+    } else if (checkRoom) {
+      res.status = 409;
+      throw new ValidationError('Conflict', [
+        `room with ${name} is already registered`,
+      ]);
+    } else {
+      const room = await orm.room.build({ name });
+      await room.save({ fields: ['name'] });
+      // Send the response
+      res.statusCode = 201;
+      res.send({
+        links: {
+          self: '/api/admin/rooms/',
+        },
+        data: {
+          type: 'rooms',
+          id: room.id,
+          attributes: {
+            name: room.name,
+            id: room.id,
+          },
+        },
+      });
+    }
+  } catch (validationError) {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
+      res.status = 400;
+      validationError.message = 'Bad Request';
+      validationError.errors = ['Empty or invalid request data'];
+    }
+    res.statusCode = res.status;
+    res.send({
+      errors: [
+        {
+          status: res.status,
+          source: '/api/rooms/',
+          message: validationError.message,
+          error: validationError.errors,
+        },
+      ],
+    });
+  }
 });
 
 router.get('/rooms/:id', authenticateToken, async (req, res) => {
@@ -452,5 +598,95 @@ router.patch(
     }
   }
 );
+
+router.post('/rooms/:roomId/messages', authenticateToken, async (req, res) => {
+  try {
+    const user = await orm.user.findOne({ where: { email: req.userEmail } });
+    const checkRoom = await orm.room.findByPk(req.params.roomId);
+    if (req.body.data.type !== 'messages') {
+      res.status = 406;
+      throw new ValidationError('Not Acceptable', ['Invalid type of request']);
+    } else if (!checkRoom) {
+      res.status = 404;
+      throw new ValidationError('Not Found', ["room provided doesn't exist"]);
+    } else {
+      let mentionedUser = null;
+      if (checkMention(req.body.data.attributes.message)) {
+        const myRegexp = /^@.*#[0-9]*/g;
+        const match = myRegexp.exec(req.body.data.attributes.message);
+        mentionedUser = await orm.user.findOne({
+          where: { username: match[0].replace('@', '') },
+        });
+      }
+      const message = await orm.message.build(req.body.data.attributes);
+      message.userId = user.id;
+      message.originalMessage = message.message;
+      await message.save({
+        fields: ['message', 'roomId', 'userId', 'originalMessage'],
+      });
+      // save on redis
+      const messagesList = await orm.message.findAll({
+        limit: 10,
+        where: { roomId: checkRoom.id },
+        include: {
+          model: orm.user,
+          attributes: ['id', 'username', 'email'],
+        },
+        order: [['createdAt', 'DESC']],
+      });
+      redisClient.set(`${checkRoom.id}`, JSON.stringify(messagesList));
+      // Send the response
+      message.user = user;
+      res.statusCode = 201;
+      let responseBody = jsonSerializer('message', {
+        attributes: ['message', 'createdAt', 'user'],
+        user: {
+          ref: 'id',
+          attributes: ['username'],
+        },
+      }).serialize(message);
+
+      // Here we should manage email sender
+      if (mentionedUser) {
+        message.mentionUser = `Sending email to ${mentionedUser.username}`;
+        const email_params = {
+          user_name: user.username,
+          reciever_name: mentionedUser.username,
+          reciever_email: mentionedUser.email,
+          room_name: checkRoom.name,
+        };
+        await sendEmail(email_params);
+        responseBody = jsonSerializer('message', {
+          attributes: ['message', 'createdAt', 'user', 'mentionUser'],
+          user: {
+            ref: 'id',
+            attributes: ['username'],
+          },
+        }).serialize(message);
+      }
+      res.send(responseBody);
+    }
+  } catch (validationError) {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
+      res.status = 400;
+      validationError.message = 'Bad Request';
+      validationError.errors = ['Empty or invalid request data'];
+    }
+    res.statusCode = res.status;
+    res.send({
+      errors: [
+        {
+          status: res.status,
+          source: `/api/admin/rooms/${req.params.roomId}/messages`,
+          message: validationError.message,
+          error: validationError.errors,
+        },
+      ],
+    });
+  }
+});
 
 module.exports = router;
