@@ -6,7 +6,7 @@ services:
     volumes:
       - ./pg-init-scripts:/docker-entrypoint-initdb.d
     env_file:
-      - ./pg-init-scripts/database.env
+      - ./pg-init-scripts/data-base.env
     ports:
       - "5432:5432"
     networks:

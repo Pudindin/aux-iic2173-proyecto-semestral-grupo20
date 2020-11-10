@@ -18,7 +18,6 @@ install:
 
 script:
   - bash pg-init-scripts/create-multiple-database.sh
-  - echo "pronto, los tests"
   - docker-compose -f docker-compose.travis.yml up -d
   - bash scripts/tests/test1.sh
   - bash scripts/tests/test2.sh
@@ -61,6 +60,5 @@ deploy:
     bundle_type: zip
     application: openchat
     deployment_group: openchat-deploy
-    wait_until_deployed: true
     on:
       branch: master

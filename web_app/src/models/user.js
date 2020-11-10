@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model,
-} = require('sequelize');
+const { Model } = require('sequelize');
 const bcrypt = require('bcrypt');
 
 const PASSWORD_SALT = 10;
@@ -24,16 +22,20 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       user.hasMany(models.message);
     }
-  };
-  user.init({
-    username: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    google: DataTypes.BOOLEAN,
-  }, {
-    sequelize,
-    modelName: 'user',
-  });
+  }
+  user.init(
+    {
+      username: DataTypes.STRING,
+      email: DataTypes.STRING,
+      password: DataTypes.STRING,
+      google: DataTypes.BOOLEAN,
+      admin: DataTypes.BOOLEAN,
+    },
+    {
+      sequelize,
+      modelName: 'user',
+    }
+  );
   user.beforeCreate(buildPasswordHash);
   user.beforeUpdate(buildPasswordHash);
 
