@@ -219,6 +219,7 @@ router.get('/google-signin', authenticateGoogleToken, async (req, res) => {
           attributes: {
             username: user.username,
             email: user.email,
+            admin: user.admin,
           },
         },
       });
@@ -277,6 +278,7 @@ router.post('/google-signup', async (req, res) => {
           attributes: {
             username: checkUser.username,
             email: checkUser.email,
+            admin: checkUser.admin,
           },
         },
       });
@@ -300,6 +302,7 @@ router.post('/google-signup', async (req, res) => {
           attributes: {
             username: user.username,
             email: user.email,
+            admin: user.admin,
           },
         },
       });
