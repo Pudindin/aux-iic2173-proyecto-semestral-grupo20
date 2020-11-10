@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class message extends Model {
     /**
@@ -14,12 +12,17 @@ module.exports = (sequelize, DataTypes) => {
       message.belongsTo(models.room);
       message.belongsTo(models.user);
     }
-  };
-  message.init({
-    message: DataTypes.TEXT,
-  }, {
-    sequelize,
-    modelName: 'message',
-  });
+  }
+  message.init(
+    {
+      message: DataTypes.TEXT,
+      originalMessage: DataTypes.TEXT,
+      visible: DataTypes.BOOLEAN,
+    },
+    {
+      sequelize,
+      modelName: 'message',
+    }
+  );
   return message;
 };

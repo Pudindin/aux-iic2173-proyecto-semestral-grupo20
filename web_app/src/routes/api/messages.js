@@ -12,8 +12,8 @@ const aws = require('aws-sdk');
 const ses = new aws.SES({
   accessKeyId: process.env.AWS_ACCES_KEY,
   secretAccessKey: process.env.AWS_SECRET_KEY,
-  region: 'us-east-2'
-})
+  region: 'us-east-2',
+});
 
 async function sendEmail(data) {
   const { reciever_name, reciever_email, user_name, room_name } = data;
@@ -25,10 +25,10 @@ async function sendEmail(data) {
   const template_params = {
     Source: 'chatapp.ass.grupo20@gmail.com',
     Destination: {
-      'ToAddresses': [reciever_email]
+      ToAddresses: [reciever_email],
     },
     Template: 'UserMention',
-    TemplateData: JSON.stringify(templateData)
+    TemplateData: JSON.stringify(templateData),
   };
   // Send email
   const response = await ses.sendTemplatedEmail(template_params).promise();
@@ -42,7 +42,6 @@ async function sendEmail(data) {
 //  room_name: 'Comicon'
 //};
 //sendEmail(params);
-
 
 const hashids = new Hashids(process.env.HASH_ID);
 const router = express.Router({ mergeParams: true });
@@ -59,7 +58,9 @@ async function authenticateToken(req, res, next) {
     if (err) {
       JWT_result = false;
     } else {
-      JWT_result = Buffer(hashids.decodeHex(data.userEmail), 'hex').toString('utf8');
+      JWT_result = Buffer(hashids.decodeHex(data.userEmail), 'hex').toString(
+        'utf8'
+      );
     }
   });
 
@@ -108,14 +109,13 @@ router.get('/', authenticateToken, async (req, res) => {
       res.status = 422;
       throw new ValidationError('Unprocessable Entity', ['No room provided']);
     }
-    const messagesList = await orm.message.findAll(
-      {
-        where: { roomId },
-        include: {
-          model: orm.user,
-        },
+    const messagesList = await orm.message.findAll({
+      where: { roomId },
+      include: {
+        model: orm.user,
       },
-    );
+    });
+    const filteredList = messagesList.filter((message) => message.visible);
     const responseBody = jsonSerializer('message', {
       attributes: ['message', 'createdAt', 'user'],
       user: {
@@ -125,10 +125,13 @@ router.get('/', authenticateToken, async (req, res) => {
       topLevelLinks: {
         self: '/api/messages',
       },
-    }).serialize(messagesList);
+    }).serialize(filteredList);
     res.send(responseBody);
   } catch (validationError) {
-    if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
       res.status = 400;
       validationError.message = 'Bad Request';
       validationError.errors = ['Empty or invalid request data'];
@@ -181,7 +184,10 @@ router.get('/fast', authenticateToken, async (req, res) => {
     }).serialize(messagesList);
     res.send(responseBody);
   } catch (validationError) {
-    if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
       res.status = 400;
       validationError.message = 'Bad Request';
       validationError.errors = ['Empty or invalid request data'];
@@ -223,34 +229,33 @@ router.post('/', authenticateToken, async (req, res) => {
       throw new ValidationError('Not Acceptable', ['Invalid type of request']);
     } else if (!checkRoom) {
       res.status = 404;
-      throw new ValidationError('Not Found', ['room provided doesn\'t exist']);
+      throw new ValidationError('Not Found', ["room provided doesn't exist"]);
     } else {
       let mentionedUser = null;
       if (checkMention(req.body.data.attributes.message)) {
         const myRegexp = /^@.*#[0-9]*/g;
         const match = myRegexp.exec(req.body.data.attributes.message);
-        mentionedUser = await orm.user.findOne(
-          {
-            where: { username: match[0].replace('@', '') },
-          },
-        );
+        mentionedUser = await orm.user.findOne({
+          where: { username: match[0].replace('@', '') },
+        });
       }
       const message = await orm.message.build(req.body.data.attributes);
       message.userId = user.id;
       message.roomId = checkRoom.id;
-      await message.save({ fields: ['message', 'roomId', 'userId'] });
+      message.originalMessage = message.message;
+      await message.save({
+        fields: ['message', 'roomId', 'userId', 'originalMessage'],
+      });
       // save on redis
-      const messagesList = await orm.message.findAll(
-        {
-          limit: 10,
-          where: { roomId: checkRoom.id },
-          include: {
-            model: orm.user,
-            attributes: ['id', 'username', 'email'],
-          },
-          order: [[ 'createdAt', 'DESC' ]],
+      const messagesList = await orm.message.findAll({
+        limit: 10,
+        where: { roomId: checkRoom.id },
+        include: {
+          model: orm.user,
+          attributes: ['id', 'username', 'email'],
         },
-      );
+        order: [['createdAt', 'DESC']],
+      });
       redisClient.set(`${checkRoom.id}`, JSON.stringify(messagesList));
       // Send the response
       message.user = user;
@@ -270,7 +275,7 @@ router.post('/', authenticateToken, async (req, res) => {
           user_name: user.username,
           reciever_name: mentionedUser.username,
           reciever_email: mentionedUser.email,
-          room_name: checkRoom.name
+          room_name: checkRoom.name,
         };
         await sendEmail(email_params);
         responseBody = jsonSerializer('message', {
@@ -284,7 +289,10 @@ router.post('/', authenticateToken, async (req, res) => {
       res.send(responseBody);
     }
   } catch (validationError) {
-    if (validationError.message === 'Cannot read property \'attributes\' of undefined') {
+    if (
+      validationError.message ===
+      "Cannot read property 'attributes' of undefined"
+    ) {
       res.status = 400;
       validationError.message = 'Bad Request';
       validationError.errors = ['Empty or invalid request data'];
