@@ -3,7 +3,7 @@
 ![](https://travis-ci.org/Pudindin/aux-iic2173-proyecto-semestral-grupo20.svg?branch=master)
 
 ## Consideraciones generales
-Toda la documentación se encuentra [en este archivo](Documentación E2 grupo 20.pdf), pero también se presenta más abajo según se enumeran los requisitos.
+Toda la documentación se encuentra [en este archivo](DocumentaciónE2grupo20.pdf), pero también se presenta más abajo según se enumeran los requisitos.
 
 La api se puede encontrar en [open-chat-api.tk](https://open-chat-api.tk). El frontend se puede encontrar en [open-chat.ml](https://open-chat.ml). El backend corre en instancias EC2 con un ELB y AutoScalingGroup. La base de datos se encuentra en DRS. El caché está en Elasticaché con Redis. El frontend está almacenado en un bucket de S3 y se consume desde un CDN.
 
