@@ -3,7 +3,7 @@
 ![](https://travis-ci.org/Pudindin/aux-iic2173-proyecto-semestral-grupo20.svg?branch=master)
 
 ## Consideraciones generales
-La documentación se encuentra aquí...
+Toda la documentación se encuentra [en este archivo](Documentación E2 grupo 20.pdf), pero también se presenta más abajo según se enumeran los requisitos.
 
 La api se puede encontrar en [open-chat-api.tk](https://open-chat-api.tk). El frontend se puede encontrar en [open-chat.ml](https://open-chat.ml). El backend corre en instancias EC2 con un ELB y AutoScalingGroup. La base de datos se encuentra en DRS. El caché está en Elasticaché con Redis. El frontend está almacenado en un bucket de S3 y se consume desde un CDN.
 
@@ -36,7 +36,7 @@ Se implementa OAuth mediante la API de GoogleAuth
 #### CI/CD
 
 ##### RF1: logrado
-El flujo se encuentra [aquí](docs/FlujoCICD.png) y se utiliza commitlint y standard-version para semantic versioning
+El flujo se encuentra [aquí](docs/FlujoCICD.png) y se utiliza commitlint y standard-version para semantic versioning. Para un nuevo release, basta correr yarn run standard-version y luego git push --set-tags.
 
 ##### RF2: logrado
 Se utiliza travis.
@@ -63,7 +63,7 @@ El flujo de CI/CD desde el pull request hasta el deploy en EC2.
 ![](docs/FlujoCICD.png)
 
 ##### RF3: logrado
-Se documentó en un archivo word siguiendo el estándar de Postman; se encuentra aquí...
+La documentación de la API se realizó mediante POSTMAN y se encuentra en [este readme](api.md).
 
 
 ### Sección variable
@@ -83,4 +83,4 @@ Se documentó en un archivo word siguiendo el estándar de Postman; se encuentra
 ##### RF2: logrado
 
 ##### RF3: logrado
-Las documentación se encuentra aquí...
+Las documentación se encuentra en el word.
