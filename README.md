@@ -1,4 +1,4 @@
-# IIC2173 - Entrega 3
+# IIC2173 - Entrega 2
 
 ![](https://travis-ci.org/Pudindin/aux-iic2173-proyecto-semestral-grupo20.svg?branch=master)
 
@@ -86,3 +86,5 @@ La documentación de la API se realizó mediante POSTMAN y se encuentra en [este
 Para la implementación de CSS Injection se optó por realizar una tabla en la base de datos, la cual contiene una columna que está relacionada con alguna sala en específico, otra columna que contiene el código CSS en sí, otra columna booleana que muestra si está aprobada o no, y finalmente una columna booleana que dice si fue probada o no.
 
 Para aplicar dicho CSS en el frontend, si está aplicada, esta es solo aplicada en la sala, donde en el primer request se pide el CSS específico para cada sala.
+
+Luego que un usuario ingresa a la sala, tiene un link para acceder al formulario de inyección. Desde ahi crea el código y se envía al backend. Luego, un administrador debe ingresar a la pagina para aprobar o rechazar las injecciones. Solo una vez que estas son aprobadas (y revisadas), se cargan en la sala
